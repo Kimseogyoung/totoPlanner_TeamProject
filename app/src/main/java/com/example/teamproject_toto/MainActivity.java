@@ -3,37 +3,33 @@ package com.example.teamproject_toto;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserInfo;
 
 public class MainActivity extends AppCompatActivity {
+    TimelineFragment timelineFragment = new TimelineFragment();
 
+    private static final String TAG="MainActivity";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment, timelineFragment).commit();
+
         if(user==null){
             //현재 로그인되어있지않다면
             myStartActivity(loginActivity.class);
         }
         else{
-            for (UserInfo profile : user.getProviderData()) {
+            //로그인되어있으면 현재화면 유지
 
-                String name = profile.getDisplayName();
-                //String email = profile.getEmail();
-                //Uri photoUrl = profile.getPhotoUrl();
-                if(name!=null){
-                    if(name.length()==0)
-                        myStartActivity(loginActivity.class);
-                }
-            }
+
+            //아직 데이터베이스에 저장한 내용 받아오는거 없음
         }
 
         findViewById(R.id.logout_btn).setOnClickListener(onClickListener);
