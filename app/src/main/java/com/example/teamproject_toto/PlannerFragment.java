@@ -1,37 +1,41 @@
 package com.example.teamproject_toto;
 
-import android.content.Context;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 
 
 public class PlannerFragment extends Fragment {
 
     // 현재 날짜 저장
-    Date today;
+    Date today = new Date();
     // date_tv 전역변수로
     TextView date_tv;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        if(getArguments() != null) {
+            int year = getArguments().getInt("Year"); // 전달한 key 값
+            int month = getArguments().getInt("Month"); // 전달한 key 값
+            int day = getArguments().getInt("Day");
+            today.setYear(year - 1900); // 대체... 비추천 써서 그런가....
+            today.setMonth(month);
+            today.setDate(day);
+            }
+
         return inflater.inflate(R.layout.fragment_planner, container, false);
     }
 
@@ -51,11 +55,9 @@ public class PlannerFragment extends Fragment {
         ImageButton tomorrow_btn = getView().findViewById(R.id.tomorrow_btn);
         yesterday_btn.setOnClickListener(dayShift);
         tomorrow_btn.setOnClickListener(dayShift);
-
     }
 
     public void Initialize(){
-        today = new Date();
         SimpleDateFormat dateformat = new SimpleDateFormat("   yyyy년 \n MM월 dd일");
         String date = dateformat.format(today);
         date_tv = getView().findViewById(R.id.date_tv);
@@ -64,7 +66,6 @@ public class PlannerFragment extends Fragment {
 
     private Date getNextDay(Date today){
         Calendar cal=Calendar.getInstance();
-
         cal.setTime(today);
         cal.add(Calendar.DATE, 1);
         return cal.getTime();
@@ -72,7 +73,6 @@ public class PlannerFragment extends Fragment {
 
     private Date getPreviousDay(Date today){
         Calendar cal=Calendar.getInstance();
-
         cal.setTime(today);
         cal.add(Calendar.DATE, -1);
         return cal.getTime();
