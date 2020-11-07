@@ -19,7 +19,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment, timelineFragment).commit();
+        //getSupportFragmentManager().beginTransaction().replace(R.id.fragment, timelineFragment).commit();
 
         if(user==null){
             //현재 로그인되어있지않다면
