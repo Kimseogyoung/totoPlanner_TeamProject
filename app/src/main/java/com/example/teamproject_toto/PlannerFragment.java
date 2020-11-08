@@ -29,8 +29,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import static androidx.constraintlayout.motion.utils.Oscillator.TAG;
 
@@ -86,7 +84,7 @@ public class PlannerFragment extends Fragment {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DataStore(items);
+                DataStore();
             }
         });
 
@@ -137,35 +135,29 @@ public class PlannerFragment extends Fragment {
         }
     };
 
-    public void DataStore(ArrayList list){
-
-        SimpleDateFormat dateformat = new SimpleDateFormat("yyyyMMdd");
-        String date = dateformat.format(today);
-        Map<String, ArrayList> map = new HashMap<String, ArrayList>();
-        map.put(date, list);
-        db.collection("users").document(user.getUid()).update("planner", map);
+    public void DataStore(){
+        SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+        String ss = format.format(today);
+        db.collection("user-planner").document(user.getUid()).update(ss, items);
+        // 이게 처음에 필드가 아무것도 없으면 실행안됨. 회원가입 거기서 이 부분 필드도 실행해야 할 것 같음
     }
 
     public void DataLoad(){
-        DocumentReference docRef = db.collection("users").document(user.getUid());
+        DocumentReference docRef = db.collection("user-planner").document(user.getUid());
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
+                    SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+                    String ss = format.format(today);
                     if (document != null) {
-                        HashMap map = (HashMap) document.getData().get("planner");
-                        SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
-                        String ss = format.format(today);
-                        ArrayList<String> day = (ArrayList<String>) map.get(ss);
-
-                        if (day != null){
-
-                            for (String str : day){
+//                        Log.d(TAG, "DocumentSnapshot data: " + document.get(ss));
+                        ArrayList<String> list = (ArrayList<String>) document.get(ss);
+                        if (list != null){
+                            for (String str : list){
                                 items.add(str);
-//                            Log.d(TAG, "DocumentSnapshot data: " + list);
                             }
-
                             ListView plan_list = getView().findViewById(R.id.plan_list);
                             ArrayAdapter<String> listAdapter = new ArrayAdapter<String>(
                                     getActivity(),
@@ -184,6 +176,7 @@ public class PlannerFragment extends Fragment {
             }
         });
     }
+
 
     View.OnClickListener myFragment = new View.OnClickListener() {
         @Override
