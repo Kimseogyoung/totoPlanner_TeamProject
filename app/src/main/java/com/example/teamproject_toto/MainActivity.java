@@ -55,9 +55,11 @@ public class MainActivity extends AppCompatActivity {
                     break;
 
                 case R.id.community_btn:
-                    CommunityFragment fragment = new CommunityFragment();
-                    transaction.replace(R.id.mainFrame, fragment);
-                    transaction.commit();
+//                    CommunityFragment fragment = new CommunityFragment();
+//                    transaction.replace(R.id.mainFrame, fragment);
+//                    transaction.commit();
+                    FirebaseAuth.getInstance().signOut();//로그아웃
+                    myStartActivity(loginActivity.class);
                     break;
             }
         }
@@ -68,4 +70,6 @@ public class MainActivity extends AppCompatActivity {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
     }
+
+
 }
