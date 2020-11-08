@@ -1,10 +1,15 @@
 package com.example.teamproject_toto;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -12,9 +17,22 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import static androidx.constraintlayout.motion.utils.Oscillator.TAG;
 
 
 public class PlannerFragment extends Fragment {
@@ -23,6 +41,12 @@ public class PlannerFragment extends Fragment {
     Date today = new Date();
     // date_tv 전역변수로
     TextView date_tv;
+    // 유저의 파이어 베이스
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+    // 리스트뷰에 추가할 리스트
+    final ArrayList<String> items = new ArrayList<String>();
+
 
     @Nullable
     @Override
@@ -45,16 +69,27 @@ public class PlannerFragment extends Fragment {
         Initialize();
 
         // fragment 생성 buttons
-        ImageButton planEdit_btn = getView().findViewById(R.id.planEdit_btn); // 일정 편집 fragment
-        TextView date_tv = getView().findViewById(R.id.date_tv); // 달력 fragment
-        planEdit_btn.setOnClickListener(myFragment);
+        Button planEdit_btn = getView().findViewById(R.id.PlanEdit_btn); // 일정 편집 fragment
+        final TextView date_tv = getView().findViewById(R.id.date_tv); // 달력 fragment
         date_tv.setOnClickListener(myFragment);
+
+        // planEdit_btn
+        planEdit_btn.setOnClickListener(Editing);
 
         // 하루 이동 buttons
         ImageButton yesterday_btn = getView().findViewById(R.id.yesterday_btn);
         ImageButton tomorrow_btn = getView().findViewById(R.id.tomorrow_btn);
         yesterday_btn.setOnClickListener(dayShift);
         tomorrow_btn.setOnClickListener(dayShift);
+
+        ImageButton button = getView().findViewById(R.id.Button);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DataStore(items);
+            }
+        });
+
     }
 
     public void Initialize(){
@@ -62,6 +97,10 @@ public class PlannerFragment extends Fragment {
         String date = dateformat.format(today);
         date_tv = getView().findViewById(R.id.date_tv);
         date_tv.setText(date);
+        items.clear();
+
+        // 저장된 값 가져오기
+        DataLoad();
     }
 
     private Date getNextDay(Date today){
@@ -78,23 +117,81 @@ public class PlannerFragment extends Fragment {
         return cal.getTime();
     }
 
+    View.OnClickListener Editing = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            EditText plan_edit = getView().findViewById(R.id.plan_edit);
+            String st = plan_edit.getText().toString();
+
+            if (st.length() > 0){
+                ListView plan_list = getView().findViewById(R.id.plan_list);
+                ArrayAdapter<String> listAdapter = new ArrayAdapter<String>(
+                        getActivity(),
+                        android.R.layout.simple_list_item_1,
+                        items
+                );
+                items.add(st);
+                plan_list.setAdapter(listAdapter);
+                plan_edit.setText("");
+            }
+        }
+    };
+
+    public void DataStore(ArrayList list){
+
+        SimpleDateFormat dateformat = new SimpleDateFormat("yyyyMMdd");
+        String date = dateformat.format(today);
+        Map<String, ArrayList> map = new HashMap<String, ArrayList>();
+        map.put(date, list);
+        db.collection("users").document(user.getUid()).update("planner", map);
+    }
+
+    public void DataLoad(){
+        DocumentReference docRef = db.collection("users").document(user.getUid());
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document != null) {
+                        HashMap map = (HashMap) document.getData().get("planner");
+                        SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+                        String ss = format.format(today);
+                        ArrayList<String> day = (ArrayList<String>) map.get(ss);
+
+                        if (day != null){
+
+                            for (String str : day){
+                                items.add(str);
+//                            Log.d(TAG, "DocumentSnapshot data: " + list);
+                            }
+
+                            ListView plan_list = getView().findViewById(R.id.plan_list);
+                            ArrayAdapter<String> listAdapter = new ArrayAdapter<String>(
+                                    getActivity(),
+                                    android.R.layout.simple_list_item_1,
+                                    items
+                            );
+                            plan_list.setAdapter(listAdapter);
+                        }
+
+                    } else {
+                        Log.d(TAG, "No such document");
+                    }
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                }
+            }
+        });
+    }
+
     View.OnClickListener myFragment = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            FragmentTransaction transaction = getFragmentManager().beginTransaction();
-            switch (view.getId()){
-                case R.id.planEdit_btn:
-                    EditPlanFragment fragment1 = new EditPlanFragment();
-                    transaction.replace(R.id.mainFrame, fragment1);
-                    transaction.commit();
-                    break;
-
-                case R.id.date_tv:
+                    FragmentTransaction transaction = getFragmentManager().beginTransaction();
                     CalenderFragment fragment2 = new CalenderFragment();
                     transaction.replace(R.id.mainFrame, fragment2);
                     transaction.commit();
-                    break;
-            }
         }
     };
 
@@ -107,6 +204,7 @@ public class PlannerFragment extends Fragment {
                     SimpleDateFormat dateformat1 = new SimpleDateFormat("   yyyy년 \n MM월 dd일");
                     String date1 = dateformat1.format(today);
                     date_tv.setText(date1);
+                    Initialize();
                     break;
 
                 case R.id.tomorrow_btn:
@@ -114,6 +212,7 @@ public class PlannerFragment extends Fragment {
                     SimpleDateFormat dateformat2 = new SimpleDateFormat("   yyyy년 \n MM월 dd일");
                     String date2 = dateformat2.format(today);
                     date_tv.setText(date2);
+                    Initialize();
                     break;
             }
         }
