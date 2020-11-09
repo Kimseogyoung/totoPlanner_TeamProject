@@ -15,22 +15,13 @@
         android:textStyle="bold" />
 
     <EditText
-        android:id="@+id/signup_name"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:layout_margin="5dp"
-        android:hint="이름"/>
-
-    <EditText
         android:id="@+id/signup_email"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
         android:inputType="textEmailAddress"
         android:layout_margin="5dp"
-        android:hint="이메일"/>
+        android:hint="이메일(아이디)"/>
 
     <EditText
         android:id="@+id/signup_password"
@@ -49,6 +40,24 @@
         android:ems="10"
         android:hint="비밀번호 확인"
         android:inputType="textPassword" />
+
+    <EditText
+        android:id="@+id/signup_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:ems="10"
+        android:hint="이름"
+        android:inputType="textPersonName" />
+
+    <EditText
+        android:id="@+id/signup_number"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:ems="10"
+        android:hint="전화번호"
+        android:inputType="phone" />
 
     <Button
         android:id="@+id/signup_btn"
