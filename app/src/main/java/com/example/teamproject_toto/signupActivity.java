@@ -17,12 +17,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserProfileChangeRequest;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class signupActivity extends Activity {
     private FirebaseAuth mAuth;
@@ -102,12 +97,8 @@ public class signupActivity extends Activity {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        Map<String, Object> data = new HashMap<>();
-        data.put("activated", true);
-
         MemberInfo memberInfo =new MemberInfo(name,phoneNumber);
         if(user!=null){
-            db.collection("user-planner").document(user.getUid()).set(data);
             db.collection("users").document(user.getUid()).set(memberInfo)
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override

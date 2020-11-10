@@ -16,7 +16,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -96,7 +95,7 @@ public class PlannerFragment extends Fragment {
         final EditText popupText=getView().findViewById(R.id.edit_Text);
 
         // fragment 생성 buttons
-        Button planEdit_btn = getView().findViewById(R.id.PlanEdit_btn); // 일정 편집 fragment
+        ImageButton planEdit_btn = getView().findViewById(R.id.PlanEdit_btn); // 일정 편집
         final TextView date_tv = getView().findViewById(R.id.date_tv); // 달력 fragment
         date_tv.setOnClickListener(myFragment);
 
@@ -108,14 +107,6 @@ public class PlannerFragment extends Fragment {
         ImageButton tomorrow_btn = getView().findViewById(R.id.tomorrow_btn);
         yesterday_btn.setOnClickListener(dayShift);
         tomorrow_btn.setOnClickListener(dayShift);
-
-        ImageButton button = getView().findViewById(R.id.Button);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                DataStore();
-            }
-        });
 
         ImageButton planUpload_btn = (ImageButton)getView().findViewById(R.id.planCheck_btn);//업로드할 일정 선택
         Button photoUpload_btn = (Button)getView().findViewById(R.id.photoupload_btn);//사진선택 버튼
@@ -210,6 +201,8 @@ public class PlannerFragment extends Fragment {
                 items.add(st);
                 plan_list.setAdapter(listAdapter);
                 plan_edit.setText("");
+
+                DataStore();
             }
         }
     };
@@ -217,22 +210,28 @@ public class PlannerFragment extends Fragment {
     public void DataStore(){
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
         String ss = format.format(today);
-        db.collection("user-planner").document(user.getUid()).update(ss, items);
-        // 이게 처음에 필드가 아무것도 없으면 실행안됨. 회원가입 거기서 이 부분 필드도 실행해야 할 것 같음
+
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("list", items);
+
+        db.collection("users").document(user.getUid())
+                .collection("planner").document(ss).set(map);
     }
 
     public void DataLoad(){
-        DocumentReference docRef = db.collection("user-planner").document(user.getUid());
+        SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+        String ss = format.format(today);
+
+        DocumentReference docRef = db.collection("users").document(user.getUid())
+                .collection("planner").document(ss);
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
-                    SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
-                    String ss = format.format(today);
                     if (document != null) {
 //                        Log.d(TAG, "DocumentSnapshot data: " + document.get(ss));
-                        ArrayList<String> list = (ArrayList<String>) document.get(ss);
+                        ArrayList<String> list = (ArrayList<String>) document.get("list");
                         if (list != null){
                             for (String str : list){
                                 items.add(str);
