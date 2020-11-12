@@ -17,7 +17,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".MainActivity"
-            android:windowSoftInputMode="adjustResize|adjustPan"> // 나중에 바꿔야 할지도
+            android:windowSoftInputMode="adjustResize|adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

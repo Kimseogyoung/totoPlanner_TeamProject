@@ -3,19 +3,25 @@ package com.example.teamproject_toto;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,6 +31,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -35,6 +43,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.remote.Datastore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -61,7 +70,7 @@ public class PlannerFragment extends Fragment {
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     // 리스트뷰에 추가할 리스트
-    final ArrayList<String> items = new ArrayList<String>();
+    static ArrayList<String> items = new ArrayList<String>();
     //리스트뷰
     ListView plan_list;
 
@@ -81,7 +90,6 @@ public class PlannerFragment extends Fragment {
             today.setDate(day);
             }
 
-
         return inflater.inflate(R.layout.fragment_planner, container, false);
     }
 
@@ -89,7 +97,7 @@ public class PlannerFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         Initialize();
-        plan_list = getView().findViewById(R.id.plan_list);//리스트뷰
+        plan_list = getView().findViewById(R.id.plan_list);//리사이클러뷰
 
         //게시글작성탭 내용
         final EditText popupText=getView().findViewById(R.id.edit_Text);
@@ -107,6 +115,9 @@ public class PlannerFragment extends Fragment {
         ImageButton tomorrow_btn = getView().findViewById(R.id.tomorrow_btn);
         yesterday_btn.setOnClickListener(dayShift);
         tomorrow_btn.setOnClickListener(dayShift);
+
+//         리스트뷰 컨텍스트 추가
+        registerForContextMenu(plan_list);
 
         ImageButton planUpload_btn = (ImageButton)getView().findViewById(R.id.planCheck_btn);//업로드할 일정 선택
         Button photoUpload_btn = (Button)getView().findViewById(R.id.photoupload_btn);//사진선택 버튼
@@ -142,7 +153,7 @@ public class PlannerFragment extends Fragment {
             }
         });
 
-        //리스트뷰 아이템클릭이벤트 리스너
+        //리스트뷰 아이템클릭이벤트 리스너 (왜 안될까?@@@@@@@@@@@)
         plan_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -156,9 +167,8 @@ public class PlannerFragment extends Fragment {
             }
         });
 
-
-
     }
+
 
     public void Initialize(){
         SimpleDateFormat dateformat = new SimpleDateFormat("   yyyy년 \n MM월 dd일");
@@ -185,6 +195,73 @@ public class PlannerFragment extends Fragment {
         return cal.getTime();
     }
 
+    // 컨텍스트 메뉴
+    @Override
+    public void onCreateContextMenu(@NonNull ContextMenu menu, @NonNull View v, @Nullable ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+
+        MenuInflater menuInflater = getActivity().getMenuInflater();
+        menuInflater.inflate(R.menu.itemselectedmenu, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(@NonNull MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
+        final int index= info.position;
+
+        switch (item.getItemId()){
+
+            case R.id.delete_item:
+                items.remove(index);
+                adapterSet();
+                SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+                String ss = format.format(today);
+                Map<String, Object> map = new HashMap<String, Object>();
+                map.put("list", items);
+                db.collection("users").document(user.getUid())
+                        .collection("planner").document(ss).set(map);
+                break;
+
+            case R.id.edit_item:
+                final LinearLayout item_menu = getActivity().findViewById(R.id.item_menu);
+                item_menu.setVisibility(View.VISIBLE);
+                Button edit_btn = getView().findViewById(R.id.edit_btn);
+
+                edit_btn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        EditText edit_et = getView().findViewById(R.id.edit_et);
+                        if (edit_et.getText().length() > 0){
+                            items.set(index, edit_et.getText().toString());
+                        }
+                        edit_et.setText("");
+                        adapterSet();
+
+                        SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+                        String ss = format.format(today);
+                        Map<String, Object> map = new HashMap<String, Object>();
+                        map.put("list", items);
+                        db.collection("users").document(user.getUid())
+                                .collection("planner").document(ss).set(map);
+                        item_menu.setVisibility(View.INVISIBLE);
+                    }
+                });
+                break;
+        }
+        return super.onContextItemSelected(item);
+    }
+
+    public void adapterSet(){
+        PlannerAdapter adapter = new PlannerAdapter();
+
+        for (String str : items){
+            adapter.addItem(str);
+        }
+
+        plan_list.setAdapter(adapter);
+    }
+
+
     View.OnClickListener Editing = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
@@ -192,20 +269,18 @@ public class PlannerFragment extends Fragment {
             String st = plan_edit.getText().toString();
 
             if (st.length() > 0){
-                //ListView plan_list = getView().findViewById(R.id.plan_list);
-                ArrayAdapter<String> listAdapter = new ArrayAdapter<String>(
-                        getActivity(),
-                        android.R.layout.simple_list_item_1,
-                        items
-                );
+
                 items.add(st);
-                plan_list.setAdapter(listAdapter);
+                adapterSet();
+
+
                 plan_edit.setText("");
 
                 DataStore();
             }
         }
     };
+
 
     public void DataStore(){
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
@@ -216,6 +291,7 @@ public class PlannerFragment extends Fragment {
 
         db.collection("users").document(user.getUid())
                 .collection("planner").document(ss).set(map);
+
     }
 
     public void DataLoad(){
@@ -230,23 +306,19 @@ public class PlannerFragment extends Fragment {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     if (document != null) {
-//                        Log.d(TAG, "DocumentSnapshot data: " + document.get(ss));
                         ArrayList<String> list = (ArrayList<String>) document.get("list");
-                        if (list != null){
-                            for (String str : list){
+
+                        plan_list = getView().findViewById(R.id.plan_list);
+
+                        if (list != null) {
+                            for (String str : list) {
                                 items.add(str);
                             }
-                            ListView plan_list = getView().findViewById(R.id.plan_list);
-                            ArrayAdapter<String> listAdapter = new ArrayAdapter<String>(
-                                    getActivity(),
-                                    android.R.layout.simple_list_item_1,
-                                    items
-                            );
-                            plan_list.setAdapter(listAdapter);
-                        }
+                            adapterSet();
+                        } else adapterSet();
 
                     } else {
-                        Log.d(TAG, "No such document");
+                        Log.d(TAG, "no such file");
                     }
                 } else {
                     Log.d(TAG, "get failed with ", task.getException());
@@ -288,8 +360,6 @@ public class PlannerFragment extends Fragment {
             }
         }
     };
-
-
 
 
     private void openPhotoPopup(){
