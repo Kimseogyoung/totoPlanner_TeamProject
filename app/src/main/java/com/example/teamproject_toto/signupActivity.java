@@ -21,6 +21,9 @@ import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class signupActivity extends Activity {
     private FirebaseAuth mAuth;
     private static final String TAG="SignupActivity";
@@ -99,8 +102,16 @@ public class signupActivity extends Activity {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        MemberInfo memberInfo =new MemberInfo(name,phoneNumber);
+        String friendcord=randomPassword(6);
+        MemberInfo memberInfo =new MemberInfo(0,name,user.getEmail(),phoneNumber,friendcord);
+
+        //1112추가
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("id", user.getEmail());
+
         if(user!=null){
+            db.collection("user-timeline").document(user.getUid()).set(map);
+            db.collection("user-timeline").document(user.getUid()).collection("timeline");
             db.collection("users").document(user.getUid()).set(memberInfo)
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
@@ -117,7 +128,31 @@ public class signupActivity extends Activity {
 
                         }
                     });
+
         }
     }
+
+    public static String randomPassword (int length) {
+            int index = 0;
+            char[] charSet = new char[] {
+                    '0','1','2','3','4','5','6','7','8','9'
+                    ,'A','B','C','D','E','F','G','H','I','J','K','L','M'
+                    ,'N','O','P','Q','R','S','T','U','V','W','X','Y','Z'
+                    ,'a','b','c','d','e','f','g','h','i','j','k','l','m'
+                    ,'n','o','p','q','r','s','t','u','v','w','x','y','z'};
+
+            StringBuffer sb = new StringBuffer();
+            for (int i=0; i<length; i++) {
+                index =  (int) (charSet.length * Math.random());
+                sb.append(charSet[index]);
+            }
+
+            return sb.toString();
+
+        }
+
+
+
+
 }
 
