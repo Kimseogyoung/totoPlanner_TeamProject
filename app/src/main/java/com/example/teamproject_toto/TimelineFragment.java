@@ -37,7 +37,7 @@ public class TimelineFragment extends Fragment {
     }
     public void update(){
         ArrayList<TimelineboardInfo> boardList = new ArrayList<>();
-        boardList.add(new TimelineboardInfo("서경","11월 29일 11:29"));
+        boardList.add(new TimelineboardInfo("서경","11월 29일 11:29","처음",0,"하이루"));
 
         adapter = new TimelineAdapter(boardList);
         recyclerView.setAdapter(adapter);

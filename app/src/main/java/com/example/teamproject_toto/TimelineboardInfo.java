@@ -8,9 +8,12 @@ public class TimelineboardInfo {
     int img=0;
     String content="";
 
-    public TimelineboardInfo( String name, String date){
+    public TimelineboardInfo( String name, String date, String title, int img, String content){
         this.name=name;
         this.date=date;
+        this.title=title;
+        this.img=img;
+        this.content=content;
     }
     public int getIcon() {
         return icon;
