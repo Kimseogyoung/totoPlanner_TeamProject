@@ -34,6 +34,10 @@ public class TimelineAdapter extends RecyclerView.Adapter<TimelineAdapter.ItemVi
         // 데이터 결합
         holder.nameText.setText(data.getName());
         holder.dateText.setText(data.getDate());
+        holder.titleText.setText(data.getTitle());
+        holder.contentText.setText(data.getContent());
+        holder.iconImg.setImageResource(data.getIcon());
+        holder.Img.setImageResource(data.getImg());
     }
 
     @Override
@@ -43,16 +47,25 @@ public class TimelineAdapter extends RecyclerView.Adapter<TimelineAdapter.ItemVi
 
 
     class ItemViewHolder extends RecyclerView.ViewHolder {
-        public TextView nameText, dateText;
+        public TextView nameText, dateText, titleText,contentText;
+        public ImageView iconImg, Img;
 
         ItemViewHolder(View itemView) {
             super(itemView);
             nameText= itemView.findViewById(R.id.item_name);
             dateText =itemView.findViewById(R.id.item_date);
+            titleText=itemView.findViewById(R.id.item_title);
+            contentText=itemView.findViewById(R.id.item_content);
+            iconImg=itemView.findViewById(R.id.item_icon);
+            Img=itemView.findViewById(R.id.item_img);
         }
         void onBind(TimelineboardInfo data) {
-            nameText.setText(data.getTitle());
+            nameText.setText(data.getName());
             dateText.setText(data.getDate());
+            titleText.setText(data.getTitle());
+            contentText.setText(data.getContent());
+            iconImg.setImageResource(data.getIcon());
+            Img.setImageResource(data.getImg());
 
         }
 

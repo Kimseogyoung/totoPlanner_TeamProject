@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -34,6 +35,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnCanceledListener;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -50,6 +52,7 @@ import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -63,19 +66,22 @@ import static androidx.constraintlayout.motion.utils.Oscillator.TAG;
 public class PlannerFragment extends Fragment {
 
     // 현재 날짜 저장
-    Date today = new Date();
+    static Date today = new Date();
     // date_tv 전역변수로
     TextView date_tv;
     // 유저의 파이어 베이스
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-    // 리스트뷰에 추가할 리스트
-    static ArrayList<String> items = new ArrayList<String>();
+    // 리스트뷰에 추가할 리스트, 체크상태 표시할 리스트
+//    ArrayList<String> items = new ArrayList<String>();
+//    static ArrayList<Boolean> checks = new ArrayList<Boolean>();
+    ArrayList<PlannerItems> items = new ArrayList<PlannerItems>();
     //리스트뷰
     ListView plan_list;
 
     String username;
     String planname;
+    ArrayList<String> userFriends=new ArrayList<String>();
     boolean planPlckmode=false;
 
     @Nullable
@@ -97,7 +103,9 @@ public class PlannerFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         Initialize();
-        plan_list = getView().findViewById(R.id.plan_list);//리사이클러뷰
+        plan_list = getView().findViewById(R.id.plan_list);//리스트뷰
+        loadUsername();
+        loadUserFriends();
 
         //게시글작성탭 내용
         final EditText popupText=getView().findViewById(R.id.edit_Text);
@@ -123,25 +131,44 @@ public class PlannerFragment extends Fragment {
         Button photoUpload_btn = (Button)getView().findViewById(R.id.photoupload_btn);//사진선택 버튼
         Button write_btn =(Button)getView().findViewById(R.id.upload_btn);//게시글 업로드
         Button exit_btn= (Button)getView().findViewById(R.id.uploadtapExit_btn);//창닫기
+
         planUpload_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                planPlckmode = true;//일정 선택 모드 활성화
+                if(!planPlckmode){
+                    planPlckmode = true;//일정 선택 모드 활성화
+                    plan_list.setBackgroundColor(Color.parseColor("#A3B4E8"));
+                }
+                else{
+                    planPlckmode=false;
+                    plan_list.setBackgroundColor(Color.parseColor("#FFFFFF"));
+                }
                 Toast.makeText(getContext(),"업로드할 일정을 선택하세요",Toast.LENGTH_SHORT).show();
             }
         });
+
         photoUpload_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 openPhotoPopup();
             }
         });
+
         write_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                SimpleDateFormat format = new SimpleDateFormat("yyyy년 MM 월 dd일 hh:mm:ss");
+                String ss = format.format(today);
+                SimpleDateFormat format2 = new SimpleDateFormat("yyyyMMddhhmmss");
+                String ss2 = format2.format(today);
+
                 getView().findViewById(R.id.uploadTap).setVisibility(View.INVISIBLE);
-                writeTimelinedata(username,"1월1일",planname+"달성 완료!",
-                        0,popupText.getText().toString());
+                writemyTimelinedata(username,ss,planname+" 달성 완료!",
+                        0,popupText.getText().toString(),ss2);
+                //loadUserFriends();
+                writeFriendsTimelinedata(username,ss,planname+" 달성 완료!",
+                        0,popupText.getText().toString(),ss2);
+
 
 
             }
@@ -153,22 +180,8 @@ public class PlannerFragment extends Fragment {
             }
         });
 
-        //리스트뷰 아이템클릭이벤트 리스너 (왜 안될까?@@@@@@@@@@@)
-        plan_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if(planPlckmode==true){
-                    if(true){//나중에 체크박스(일정달성여부) 체크되었는지 확인해야함@@@@@@@@@@@@@@@@@
-                        planPlckmode=false;
-                        planname=items.get(position);//선택한일정내용
-                        getView().findViewById(R.id.uploadTap).setVisibility(View.VISIBLE);
-                    }
-                }
-            }
-        });
 
     }
-
 
     public void Initialize(){
         SimpleDateFormat dateformat = new SimpleDateFormat("   yyyy년 \n MM월 dd일");
@@ -213,36 +226,27 @@ public class PlannerFragment extends Fragment {
 
             case R.id.delete_item:
                 items.remove(index);
+//                checks.remove(index);
                 adapterSet();
-                SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
-                String ss = format.format(today);
-                Map<String, Object> map = new HashMap<String, Object>();
-                map.put("list", items);
-                db.collection("users").document(user.getUid())
-                        .collection("planner").document(ss).set(map);
+                DataStore();
                 break;
 
             case R.id.edit_item:
                 final LinearLayout item_menu = getActivity().findViewById(R.id.item_menu);
                 item_menu.setVisibility(View.VISIBLE);
-                Button edit_btn = getView().findViewById(R.id.edit_btn);
+                final Button edit_btn = getView().findViewById(R.id.edit_btn);
 
                 edit_btn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         EditText edit_et = getView().findViewById(R.id.edit_et);
                         if (edit_et.getText().length() > 0){
-                            items.set(index, edit_et.getText().toString());
+                            PlannerItems item = new PlannerItems(edit_et.getText().toString(), false);
+                            items.set(index, item);
                         }
                         edit_et.setText("");
+                        DataStore();
                         adapterSet();
-
-                        SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
-                        String ss = format.format(today);
-                        Map<String, Object> map = new HashMap<String, Object>();
-                        map.put("list", items);
-                        db.collection("users").document(user.getUid())
-                                .collection("planner").document(ss).set(map);
                         item_menu.setVisibility(View.INVISIBLE);
                     }
                 });
@@ -251,15 +255,6 @@ public class PlannerFragment extends Fragment {
         return super.onContextItemSelected(item);
     }
 
-    public void adapterSet(){
-        PlannerAdapter adapter = new PlannerAdapter();
-
-        for (String str : items){
-            adapter.addItem(str);
-        }
-
-        plan_list.setAdapter(adapter);
-    }
 
 
     View.OnClickListener Editing = new View.OnClickListener() {
@@ -269,62 +264,88 @@ public class PlannerFragment extends Fragment {
             String st = plan_edit.getText().toString();
 
             if (st.length() > 0){
-
-                items.add(st);
-                adapterSet();
-
+                PlannerItems item = new PlannerItems(st, false);
+                items.add(item);
 
                 plan_edit.setText("");
 
                 DataStore();
+                adapterSet();
             }
         }
     };
+
+    public void adapterSet(){
+        PlannerAdapter adapter = new PlannerAdapter();
+
+        for (int i = 0; i < items.size(); i++){
+            adapter.addItem(items.get(i));
+        }
+
+        plan_list.setAdapter(adapter);
+    }
 
 
     public void DataStore(){
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
         String ss = format.format(today);
 
-        Map<String, Object> map = new HashMap<String, Object>();
-        map.put("list", items);
+        ArrayList<String> textlist = new ArrayList<String>();
+        ArrayList<Boolean> cvlist = new ArrayList<Boolean>();
+        for (PlannerItems item : items){
+            textlist.add(item.getText());
+            cvlist.add(item.getCv());
+        }
+
+        Map map = new HashMap<String, ArrayList>();
+        map.put("text", textlist);
+        map.put("cv", cvlist);
 
         db.collection("users").document(user.getUid())
                 .collection("planner").document(ss).set(map);
+
 
     }
 
     public void DataLoad(){
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
-        String ss = format.format(today);
+        final String ss = format.format(today);
 
         DocumentReference docRef = db.collection("users").document(user.getUid())
                 .collection("planner").document(ss);
+
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     if (document != null) {
-                        ArrayList<String> list = (ArrayList<String>) document.get("list");
+
+                        ArrayList<String> list = (ArrayList<String>) document.get("text");
+                        ArrayList<Boolean> clist = (ArrayList<Boolean>) document.get("cv");
 
                         plan_list = getView().findViewById(R.id.plan_list);
 
-                        if (list != null) {
-                            for (String str : list) {
-                                items.add(str);
-                            }
-                            adapterSet();
-                        } else adapterSet();
-
+                        if (list != null && clist != null) {
+                            if (list.size() == clist.size()){
+                                for (int i = 0; i < list.size(); i++){
+                                    PlannerItems item = new PlannerItems(list.get(i), clist.get(i));
+                                    items.add(item);
+                                    Log.d(TAG, "for 문 : " + i);
+                                }
+                                Log.d(TAG, "load 후 items : " + items.size());
+                            } else Log.d(TAG, "크기 다름 이상");
+                        } else Log.d(TAG, "list/clist 비었음");
                     } else {
                         Log.d(TAG, "no such file");
                     }
                 } else {
                     Log.d(TAG, "get failed with ", task.getException());
                 }
+                adapterSet();
             }
         });
+
     }
 
 
@@ -469,16 +490,20 @@ public class PlannerFragment extends Fragment {
 
         }
     }
-    private void writeTimelinedata(String name, String data,String title, int img,String content){
+    private void writemyTimelinedata(String name, String data,String title, int img,String content,String docuName){
+
         TimelineboardInfo timelineboardInfo=new TimelineboardInfo(name, data,title,img,content);
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         if(user!=null){
+            db.collection("user-timeline").document(user.getUid())
+                    .collection("timeline").document(docuName).set(timelineboardInfo);
             db.collection("users").document(user.getUid())
-                    .collection("timeline").document("201101121212").set(timelineboardInfo)
+                    .collection("timeline").document(docuName).set(timelineboardInfo)
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
+
                             Toast.makeText(getContext(),"업로드에 성공했습니다",Toast.LENGTH_SHORT).show();
                         }
 
@@ -493,6 +518,64 @@ public class PlannerFragment extends Fragment {
                     });
         }
 
+
+    }
+    private  void writeFriendsTimelinedata(String name, String data,String title, int img,String content,String docuName){
+        TimelineboardInfo timelineboardInfo=new TimelineboardInfo(name, data,title,img,content);
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        if(userFriends!=null){
+            for(String friend : userFriends){
+                db.collection("user-timeline").document(friend)
+                        .collection("timeline").document(docuName).set(timelineboardInfo);
+            }
+        }
+    }
+    private void loadUsername(){
+        DocumentReference docRef = db.collection("users").document(user.getUid());
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document != null) {
+                        username = (String) document.get("name");
+                    } else {
+                        Log.d(TAG, "No such document");
+                    }
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                }
+            }
+        });
+    }
+
+
+    private void loadUserFriends(){
+
+        DocumentReference docRef = db.collection("users").document(user.getUid());
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document != null) {
+                        ArrayList<String> list = (ArrayList<String>) document.get("friends");
+                        if (list != null){
+                            for (String str : list){
+                                Log.d(TAG, "add"+str);
+                                userFriends.add(str);
+                            }
+                        }
+                    } else {
+                        Log.d(TAG, "No such document");
+                    }
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                }
+            }
+        });
     }
 
 }

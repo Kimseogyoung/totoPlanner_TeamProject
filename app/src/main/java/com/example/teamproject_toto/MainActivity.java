@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.planner_btn).setOnClickListener(onClickListener);
         findViewById(R.id.timeline_btn).setOnClickListener(onClickListener);
         findViewById(R.id.community_btn).setOnClickListener(onClickListener);
+        findViewById(R.id.profileFriend_btn).setOnClickListener(onClickListener);
 
 
     }
@@ -75,6 +76,13 @@ public class MainActivity extends AppCompatActivity {
 //                    transaction.commit();
                     FirebaseAuth.getInstance().signOut();//로그아웃
                     myStartActivity(loginActivity.class);
+                    break;
+
+                case R.id.profileFriend_btn:
+                    ProfileandFriendFragment fragment4 = new ProfileandFriendFragment();
+
+                    transaction.replace(R.id.mainFrame, fragment4);
+                    transaction.commit();
                     break;
             }
         }
