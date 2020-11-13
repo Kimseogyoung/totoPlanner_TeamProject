@@ -21,7 +21,7 @@ public class ProfileandFriendAdapter extends RecyclerView.Adapter<ProfileandFrie
     @NonNull
     @Override
     public ItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View holderView = LayoutInflater.from(parent.getContext()).inflate(R.layout.profileandfrienditems, parent, false);
+        View holderView = LayoutInflater.from(parent.getContext()).inflate(R.layout.profileandfirenditems, parent, false);
 
         return new ItemViewHolder(holderView);
     }
@@ -34,12 +34,12 @@ public class ProfileandFriendAdapter extends RecyclerView.Adapter<ProfileandFrie
         holder.nameText.setText(data.getName());
         holder.iconImg.setImageResource(data.getIcon());
 
-}
+    }
 
     @Override
     public int getItemCount() {
-return listData.size();
-}
+        return listData.size();
+    }
 
 
     class ItemViewHolder extends RecyclerView.ViewHolder {
@@ -47,11 +47,11 @@ return listData.size();
         public ImageView iconImg;
 
         ItemViewHolder(View itemView) {
-                super(itemView);
-                nameText= itemView.findViewById(R.id.friendlist_name);
-                iconImg=itemView.findViewById(R.id.friendlist_icon);
+            super(itemView);
+            nameText= itemView.findViewById(R.id.friendlist_name);
+            iconImg=itemView.findViewById(R.id.friendlist_icon);
 
-}
+        }
         void onBind(TimelineboardInfo data) {
 
             nameText.setText(data.getName());

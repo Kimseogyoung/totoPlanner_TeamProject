@@ -5,16 +5,17 @@ public class TimelineboardInfo {
     String name;
     String date;
     String title="";
-    int img=0;
+    String img="";
     String content="";
 
-    public TimelineboardInfo( String name, String date, String title, int img, String content){
+    public TimelineboardInfo( String name, String date, String title, String img, String content){
         this.name=name;
         this.date=date;
         this.title=title;
         this.img=img;
         this.content=content;
     }
+
     public int getIcon() {
         return icon;
     }
@@ -39,11 +40,11 @@ public class TimelineboardInfo {
         this.date = date;
     }
 
-    public int getImg() {
+    public String getImg() {
         return img;
     }
 
-    public void setImg(int img) {
+    public void setImg(String img) {
         this.img = img;
     }
 

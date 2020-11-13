@@ -23,7 +23,9 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -70,15 +72,15 @@ public class TimelineFragment extends Fragment {
                             for (QueryDocumentSnapshot document : task.getResult()) {
 
                                 Log.d(TAG, document.getId() + " => " + document.getData().get("name"));
-                                boardList.add(new TimelineboardInfo(""+document.getData().get("name"),
+                                boardList.add(0,new TimelineboardInfo(""+document.getData().get("name"),
                                         ""+document.getData().get("date"),
                                         ""+document.getData().get("title"),
-                                        0,
+                                        ""+document.getData().get("img"),
                                         ""+document.getData().get("content")));
 
 
                             }
-                            adapter = new TimelineAdapter(boardList);
+                            adapter = new TimelineAdapter(boardList,getContext());
                             recyclerView.setAdapter(adapter);
                         } else {
                             Log.d(TAG, "Error getting documents: ", task.getException());

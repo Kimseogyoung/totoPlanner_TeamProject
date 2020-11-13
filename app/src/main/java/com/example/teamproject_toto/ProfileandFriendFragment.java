@@ -54,9 +54,9 @@ public class ProfileandFriendFragment extends Fragment {
     private ArrayList<String> frienduidList =new ArrayList<>();
 
 
-     @Nullable
-     @Override
-     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container
             , @Nullable Bundle savedInstanceState){
         View view = inflater.inflate(R.layout.profileandfriend_fragment,container,false);
 
@@ -76,7 +76,7 @@ public class ProfileandFriendFragment extends Fragment {
 
 
 
-         return view;
+        return view;
     }
 
     View.OnClickListener onClickListener = new View.OnClickListener() {
@@ -92,48 +92,48 @@ public class ProfileandFriendFragment extends Fragment {
         }
     };
 
-     private void setup(){//기본화면 업뎃,프로필업뎃,친구목록업뎃
+    private void setup(){//기본화면 업뎃,프로필업뎃,친구목록업뎃
 
 
-         DocumentReference docRef = db.collection("users").document(user.getUid());
-         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-             @Override
-             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                 if (task.isSuccessful()) {
-                     DocumentSnapshot document = task.getResult();
-                     if (document != null) {
-                         String name=""+document.get("name");
-                         String email="이메일 : "+user.getEmail();
-                         String phonenumber="전화번호 : "+document.get("phoneNumber");
-                         myfriendcord=""+document.get("friendcord");
-                         String cord ="친구 코드 : "+myfriendcord;
+        DocumentReference docRef = db.collection("users").document(user.getUid());
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document != null) {
+                        String name=""+document.get("name");
+                        String email="이메일 : "+user.getEmail();
+                        String phonenumber="전화번호 : "+document.get("phoneNumber");
+                        myfriendcord=""+document.get("friendcord");
+                        String cord ="친구 코드 : "+myfriendcord;
 
 
-                         TextView nametext= getView().findViewById(R.id.profile_username);
-                         TextView emailtext= getView().findViewById(R.id.profile_email);
-                         TextView phonenumbertext= getView().findViewById(R.id.profile_phonenumber);
-                         TextView friendcordtext= getView().findViewById(R.id.profile_userfriendcord);
+                        TextView nametext= getView().findViewById(R.id.profile_username);
+                        TextView emailtext= getView().findViewById(R.id.profile_email);
+                        TextView phonenumbertext= getView().findViewById(R.id.profile_phonenumber);
+                        TextView friendcordtext= getView().findViewById(R.id.profile_userfriendcord);
 
-                         nametext.setText(name);
-                         emailtext.setText(email);
-                         phonenumbertext.setText(phonenumber);
-                         friendcordtext.setText(cord);
+                        nametext.setText(name);
+                        emailtext.setText(email);
+                        phonenumbertext.setText(phonenumber);
+                        friendcordtext.setText(cord);
 
-                     } else {
-                         Log.d(TAG, "No such document");
-                     }
-                 } else {
-                     Log.d(TAG, "get failed with ", task.getException());
-                 }
-             }
-         });
+                    } else {
+                        Log.d(TAG, "No such document");
+                    }
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                }
+            }
+        });
 
 
-         loadmyFriendList();
+        loadmyFriendList();
 
-     }
+    }
 
-     //데이터 읽어와서 어뎁터 업데이트하는 함수
+    //데이터 읽어와서 어뎁터 업데이트하는 함수
     //개느림 근데 개선불가 ㅋ;
     private  void loadmyFriendList(){
 
@@ -162,6 +162,7 @@ public class ProfileandFriendFragment extends Fragment {
                                                         ,(String) document.get("name"),"","","");
 
                                                 myfriendList.add(m);
+
                                                 adapter = new ProfileandFriendAdapter(myfriendList);
                                                 recyclerView.setAdapter(adapter);
                                             }
@@ -189,48 +190,49 @@ public class ProfileandFriendFragment extends Fragment {
 
 
     private void addFriend(final String friendcord){
-         if(!friendcord.equals(myfriendcord) ){
+        if(!friendcord.equals(myfriendcord) ){
 
-             Log.d(TAG, myfriendcord);
-             db.collection("users")
-                     .get()
-                     .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                         @Override
-                         public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                             if (task.isSuccessful()) {
-                                 for (QueryDocumentSnapshot document : task.getResult()) {
+            Log.d(TAG, myfriendcord);
+            db.collection("users")
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if (task.isSuccessful()) {
+                                for (QueryDocumentSnapshot document : task.getResult()) {
 
-                                     if (("" + document.getData().get("friendcord")).equals(friendcord)) {
-                                         if (!frienduidList.contains("" + document.getId())) {
-                                             Log.d(TAG, "contain");
-                                             int icon = 0;
-                                             //내친구 데이터에 친구추가
-                                             frienduidList.add("" + document.getId());
-                                             DocumentReference Ref1 = db.collection("users").document(user.getUid());
-                                             Ref1.update("friends", FieldValue.arrayUnion("" + document.getId()));
+                                    if (("" + document.getData().get("friendcord")).equals(friendcord)) {
+                                        if (!frienduidList.contains("" + document.getId())) {
+                                            Log.d(TAG, "contain");
+                                            int icon = 0;
+                                            //내친구 데이터에 친구추가
+                                            frienduidList.add("" + document.getId());
 
-                                             //친구 데이터에 나를 추가
-                                             DocumentReference Ref2 = db.collection("users").document("" + document.getId());
-                                             Ref2.update("friends", FieldValue.arrayUnion(user.getUid()));
+                                            DocumentReference Ref1 = db.collection("users").document(user.getUid());
+                                            Ref1.update("friends", FieldValue.arrayUnion("" + document.getId()));
+
+                                            //친구 데이터에 나를 추가
+                                            DocumentReference Ref2 = db.collection("users").document("" + document.getId());
+                                            Ref2.update("friends", FieldValue.arrayUnion(user.getUid()));
 
 
-                                             //어뎁터 업데이트
-                                             loadmyFriendList();
+                                            //어뎁터 업데이트
+                                            loadmyFriendList();
 
-                                             //삭제는 이렇게
-                                             //Ref2.update("friends", FieldValue.arrayRemove(user.getUid()));
-                                             break;
+                                            //삭제는 이렇게
+                                            //Ref2.update("friends", FieldValue.arrayRemove(user.getUid()));
+                                            break;
 
-                                         }
-                                     }
-                                 }
+                                        }
+                                    }
+                                }
 
-                             } else {
-                                 Log.d(TAG, "Error getting documents: ", task.getException());
-                             }
-                         }
-                     });
-         }
+                            } else {
+                                Log.d(TAG, "Error getting documents: ", task.getException());
+                            }
+                        }
+                    });
+        }
     }
     private void setFriendsData(String userUID,ArrayList<String> list){
         Map<String, Object> map = new HashMap<String, Object>();
