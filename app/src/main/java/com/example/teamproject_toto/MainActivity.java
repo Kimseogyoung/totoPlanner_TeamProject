@@ -71,18 +71,17 @@ public class MainActivity extends AppCompatActivity {
                     break;
 
                 case R.id.community_btn:
-//                    CommunityFragment fragment = new CommunityFragment();
-//                    transaction.replace(R.id.mainFrame, fragment);
-//                    transaction.commit();
-                    FirebaseAuth.getInstance().signOut();//로그아웃
-                    myStartActivity(loginActivity.class);
+                    CommunityFragment fragment = new CommunityFragment();
+                    transaction.replace(R.id.mainFrame, fragment);
+                    transaction.commit();
                     break;
 
                 case R.id.profileFriend_btn:
-                    ProfileandFriendFragment fragment4 = new ProfileandFriendFragment();
-
-                    transaction.replace(R.id.mainFrame, fragment4);
-                    transaction.commit();
+//                    ProfileandFriendFragment fragment4 = new ProfileandFriendFragment();
+//                    transaction.replace(R.id.mainFrame, fragment4);
+//                    transaction.commit();
+                    FirebaseAuth.getInstance().signOut();
+                    myStartActivity(loginActivity.class);
                     break;
             }
         }

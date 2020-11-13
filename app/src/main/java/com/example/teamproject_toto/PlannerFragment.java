@@ -30,6 +30,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -59,6 +60,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import static androidx.constraintlayout.motion.utils.Oscillator.TAG;
 
@@ -73,8 +75,6 @@ public class PlannerFragment extends Fragment {
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     // 리스트뷰에 추가할 리스트, 체크상태 표시할 리스트
-//    ArrayList<String> items = new ArrayList<String>();
-//    static ArrayList<Boolean> checks = new ArrayList<Boolean>();
     ArrayList<PlannerItems> items = new ArrayList<PlannerItems>();
     //리스트뷰
     ListView plan_list;
@@ -127,25 +127,11 @@ public class PlannerFragment extends Fragment {
 //         리스트뷰 컨텍스트 추가
         registerForContextMenu(plan_list);
 
-        ImageButton planUpload_btn = (ImageButton)getView().findViewById(R.id.planCheck_btn);//업로드할 일정 선택
+        ImageButton random_btn = (ImageButton)getView().findViewById(R.id.random_btn);
         Button photoUpload_btn = (Button)getView().findViewById(R.id.photoupload_btn);//사진선택 버튼
         Button write_btn =(Button)getView().findViewById(R.id.upload_btn);//게시글 업로드
         Button exit_btn= (Button)getView().findViewById(R.id.uploadtapExit_btn);//창닫기
 
-        planUpload_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(!planPlckmode){
-                    planPlckmode = true;//일정 선택 모드 활성화
-                    plan_list.setBackgroundColor(Color.parseColor("#A3B4E8"));
-                }
-                else{
-                    planPlckmode=false;
-                    plan_list.setBackgroundColor(Color.parseColor("#FFFFFF"));
-                }
-                Toast.makeText(getContext(),"업로드할 일정을 선택하세요",Toast.LENGTH_SHORT).show();
-            }
-        });
 
         photoUpload_btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -177,6 +163,42 @@ public class PlannerFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 getView().findViewById(R.id.uploadTap).setVisibility(View.INVISIBLE);
+            }
+        });
+
+        //random_btn -> 하루 한 번만 하게 하는 거랑, 삭제하면 다시 할 수 있게 하는 거 추가@@@@@
+        random_btn.setOnClickListener(new View.OnClickListener() {
+            int randomFlag = 0;
+            @Override
+            public void onClick(View view) {
+                RandomList randomList = new RandomList();
+                String random = "😁 " + randomList.getRandomitem();
+
+                ArrayList<String> temp = new ArrayList<String>();
+                for (PlannerItems plannerItems : items){
+                    temp.add(plannerItems.getText());
+                }
+
+                if (!temp.contains(random)){
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
+                    if (simpleDateFormat.format(today).equals(simpleDateFormat.format(new Date()))){
+
+                        AlertDialog.Builder dlg = new AlertDialog.Builder(getContext());
+                        dlg.setTitle("오늘의 소확행은?"); //제목
+
+                        // 아이템에 넣어주기
+                        PlannerItems item = new PlannerItems(random, false);
+                        items.add(item);
+                        DataStore();
+                        adapterSet();
+
+                        dlg.setMessage(random); // 메시지
+                        dlg.show();
+
+                    } else Toast.makeText(getContext(),"소확행은 오늘만!",Toast.LENGTH_SHORT).show();
+
+                } else Toast.makeText(getContext(),"소확행은 한번만!",Toast.LENGTH_SHORT).show();
+
             }
         });
 
@@ -226,7 +248,6 @@ public class PlannerFragment extends Fragment {
 
             case R.id.delete_item:
                 items.remove(index);
-//                checks.remove(index);
                 adapterSet();
                 DataStore();
                 break;
@@ -254,7 +275,6 @@ public class PlannerFragment extends Fragment {
         }
         return super.onContextItemSelected(item);
     }
-
 
 
     View.OnClickListener Editing = new View.OnClickListener() {
@@ -331,9 +351,7 @@ public class PlannerFragment extends Fragment {
                                 for (int i = 0; i < list.size(); i++){
                                     PlannerItems item = new PlannerItems(list.get(i), clist.get(i));
                                     items.add(item);
-                                    Log.d(TAG, "for 문 : " + i);
                                 }
-                                Log.d(TAG, "load 후 items : " + items.size());
                             } else Log.d(TAG, "크기 다름 이상");
                         } else Log.d(TAG, "list/clist 비었음");
                     } else {

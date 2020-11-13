@@ -1,5 +1,6 @@
 package com.example.teamproject_toto;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -74,10 +75,9 @@ public class ProfileandFriendFragment extends Fragment {
 
 
 
-
-
         return view;
     }
+
 
     View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
