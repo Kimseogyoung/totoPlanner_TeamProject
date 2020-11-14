@@ -102,8 +102,8 @@ public class signupActivity extends Activity {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        String friendcord=randomPassword(6);
-        MemberInfo memberInfo =new MemberInfo(0,name,user.getEmail(),phoneNumber,friendcord);
+        String friendcode=randomPassword(6);
+        MemberInfo memberInfo =new MemberInfo(user.getUid(),name,user.getEmail(),phoneNumber,friendcode);
 
         //1112추가
         Map<String, Object> map = new HashMap<String, Object>();

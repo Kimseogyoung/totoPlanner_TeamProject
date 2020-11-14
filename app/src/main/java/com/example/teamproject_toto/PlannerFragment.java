@@ -500,7 +500,7 @@ public class PlannerFragment extends Fragment {
     }
     private void writemyTimelinedata(String name, String data,String title, String img,String content,String docuName){
 
-        TimelineboardInfo timelineboardInfo=new TimelineboardInfo(name, data,title,img,content);
+        TimelineboardInfo timelineboardInfo=new TimelineboardInfo(user.getUid(),name, data,title,img,content);
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         if(user!=null){
@@ -531,7 +531,7 @@ public class PlannerFragment extends Fragment {
     }
     private  void writeFriendsTimelinedata(String name, String data,String title, String img,String content,String docuName){
 
-        TimelineboardInfo timelineboardInfo=new TimelineboardInfo(name, data,title,img,content);
+        TimelineboardInfo timelineboardInfo=new TimelineboardInfo(user.getUid(),name, data,title,img,content);
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         if(userFriends!=null){

@@ -3,24 +3,24 @@ package com.example.teamproject_toto;
 import java.util.ArrayList;
 
 public class MemberInfo {
-    private int icon;
+    private String icon;
     private String name;
     private String id;
     private String phoneNumber;
     private ArrayList<String> friends;
-    private String friendcord;
+    private String friendcode;
 
-    public MemberInfo(int icon,String name,String id,String phoneNumber ,String friendcord){
+    public MemberInfo(String icon,String name,String id,String phoneNumber ,String friendcode){
         this.icon=icon;
         this.name=name;
         this.id=id;
         this.phoneNumber=phoneNumber;
-        this.friendcord=friendcord;
+        this.friendcode=friendcode;
         friends=new ArrayList<String>();
 
     }
-    public int getIcon(){return icon;}
-    public void setIcon(int icon){this.icon=icon;}
+    public String getIcon(){return icon;}
+    public void setIcon(String icon){this.icon=icon;}
 
     public String getName(){return name;}
     public void setName(String n){name=n;}
@@ -41,12 +41,12 @@ public class MemberInfo {
         this.phoneNumber = phoneNumber;
     }
 
-    public void setFriendcord(String friendcord) {
-        this.friendcord = friendcord;
+    public void setFriendcode(String friendcode) {
+        this.friendcode = friendcode;
     }
 
-    public String getFriendcord() {
-        return friendcord;
+    public String getFriendcode() {
+        return friendcode;
     }
 
 }

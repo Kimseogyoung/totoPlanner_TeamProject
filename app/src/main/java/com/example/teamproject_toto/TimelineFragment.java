@@ -63,7 +63,7 @@ public class TimelineFragment extends Fragment {
     public void update(){
 
 
-        db.collection("users").document(user.getUid()).collection("timeline")
+        db.collection("user-timeline").document(user.getUid()).collection("timeline")
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -72,7 +72,9 @@ public class TimelineFragment extends Fragment {
                             for (QueryDocumentSnapshot document : task.getResult()) {
 
                                 Log.d(TAG, document.getId() + " => " + document.getData().get("name"));
-                                boardList.add(0,new TimelineboardInfo(""+document.getData().get("name"),
+                                boardList.add(0,
+                                        new TimelineboardInfo(""+document.getData().get("writercode"),
+                                        ""+document.getData().get("name"),
                                         ""+document.getData().get("date"),
                                         ""+document.getData().get("title"),
                                         ""+document.getData().get("img"),

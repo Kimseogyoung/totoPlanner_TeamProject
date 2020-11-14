@@ -1,14 +1,15 @@
 package com.example.teamproject_toto;
 
 public class TimelineboardInfo {
-    int icon=0;
+    String writercode;
     String name;
     String date;
     String title="";
     String img="";
     String content="";
 
-    public TimelineboardInfo( String name, String date, String title, String img, String content){
+    public TimelineboardInfo(String writercode ,String name, String date, String title, String img, String content){
+        this.writercode=writercode;
         this.name=name;
         this.date=date;
         this.title=title;
@@ -16,12 +17,12 @@ public class TimelineboardInfo {
         this.content=content;
     }
 
-    public int getIcon() {
-        return icon;
+    public String getWritercode() {
+        return writercode;
     }
 
-    public void setIcon(int icon) {
-        this.icon = icon;
+    public void setWritercode(String writercode) {
+        this.writercode = writercode;
     }
 
     public String getName() {

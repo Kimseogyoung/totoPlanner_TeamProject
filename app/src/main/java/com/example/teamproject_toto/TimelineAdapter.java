@@ -51,7 +51,6 @@ public class TimelineAdapter extends RecyclerView.Adapter<TimelineAdapter.ItemVi
         holder.dateText.setText(data.getDate());
         holder.titleText.setText(data.getTitle());
         holder.contentText.setText(data.getContent());
-        holder.iconImg.setImageResource(data.getIcon());
 
 
             //FirebaseStorage 인스턴스를 생성
@@ -73,8 +72,23 @@ public class TimelineAdapter extends RecyclerView.Adapter<TimelineAdapter.ItemVi
                     }
                 }
             });
-
-
+            StorageReference storageReference2 = firebaseStorage.getReference().child("profile/"+data.getWritercode());
+            //StorageReference에서 파일 다운로드 URL 가져옴
+            storageReference2.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+                @Override
+                public void onComplete(@NonNull Task<Uri> task) {
+                     if (task.isSuccessful()) {
+                        // Glide 이용하여 이미지뷰에 로딩
+                        Glide.with(context)
+                            .load(task.getResult())
+                            .into(holder.iconImg);
+                    }
+                     else{
+                         //못가져오면
+                         holder.iconImg.setImageResource(R.drawable.basic);
+                     }
+                }
+            });
 
 
 
