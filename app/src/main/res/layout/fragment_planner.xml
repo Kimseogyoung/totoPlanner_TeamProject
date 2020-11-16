@@ -69,14 +69,6 @@
             android:layout_gravity="center"
             android:text="추가" />
 
-<!--        <ImageButton-->
-<!--            android:id="@+id/planCheck_btn"-->
-<!--            android:layout_row="3"-->
-<!--            android:layout_column="2"-->
-<!--            android:layout_gravity="center_horizontal"-->
-<!--            android:layout_rowWeight="1"-->
-<!--            android:background="#00FFFFFF"-->
-<!--            android:src="@drawable/pencil_icon" />-->
         <ImageButton
             android:id="@+id/random_btn"
             android:layout_row="3"

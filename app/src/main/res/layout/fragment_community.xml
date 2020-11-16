@@ -5,10 +5,53 @@
     android:layout_height="match_parent"
     tools:context=".CommunityFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="hello_blank_fragment" />
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/daily_life_tv"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="10dp"
+            android:background="#9AFFB0AA"
+            android:gravity="center|left"
+            android:text="일상 공유 게시판"
+            android:textSize="30dp" />
+
+        <TextView
+            android:id="@+id/employment_tv"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="10dp"
+            android:background="#F4E0C3"
+            android:gravity="center|left"
+            android:text="취업 게시판"
+            android:textSize="30dp" />
+
+        <TextView
+        android:id="@+id/exercise_tv"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginTop="10dp"
+        android:background="#F8F2C2"
+        android:gravity="center|left"
+        android:text="운동 게시판"
+        android:textSize="30dp" />
+
+        <TextView
+            android:id="@+id/smallhappy_tv"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="10dp"
+            android:background="#D6F3B5"
+            android:gravity="center|left"
+            android:text="오늘의 소확행 게시판"
+            android:textSize="30dp" />
+
+    </LinearLayout>
+
+
 
 </FrameLayout>
