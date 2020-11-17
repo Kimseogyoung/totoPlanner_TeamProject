@@ -153,11 +153,11 @@ public class PlannerFragment extends Fragment {
                 items.get(planidx).setUploaded(true);
                 DataStore();
 
-                SimpleDateFormat format = new SimpleDateFormat("yyyy년 MM 월 dd일 hh:mm:ss");
+                SimpleDateFormat format = new SimpleDateFormat("yyyy년 MM 월 dd일 HH:mm:ss");
                 Date now = new Date();
                 String ss = format.format(now);
 
-                SimpleDateFormat format2 = new SimpleDateFormat("yyyyMMddhhmmss");
+                SimpleDateFormat format2 = new SimpleDateFormat("yyyyMMddHHmmss");
                 String ss2 = format2.format(now);
                 getView().findViewById(R.id.uploadTap).setVisibility(View.INVISIBLE);
 
