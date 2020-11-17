@@ -307,21 +307,25 @@ public class PlannerFragment extends Fragment {
                 break;
 
             case R.id.upload_item:
-                if(items.get(index).getCv() && !items.get(index).getUploaded()){// 체크박스(일정달성여부) 체크되었는지 확인해야함@@@@@@@@@@@@@@@@@
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
+                if (simpleDateFormat.format(today).equals(simpleDateFormat.format(new Date()))){
+                    if(items.get(index).getCv() && !items.get(index).getUploaded()){// 체크박스(일정달성여부) 체크되었는지 확인해야함@@@@@@@@@@@@@@@@@
 
-                    planidx=index;
-                    planname = items.get(index).getText();//선택한일정내용
-                    getView().findViewById(R.id.uploadTap).setVisibility(View.VISIBLE);
+                        planidx=index;
+                        planname = items.get(index).getText();//선택한일정내용
+                        getView().findViewById(R.id.uploadTap).setVisibility(View.VISIBLE);
 
-                    TextView phototext=getView().findViewById(R.id.photourl_text);
-                    phototext.setText("첨부된 사진 없음" );
-                    EditText editText=getView().findViewById(R.id.edit_Text);
-                    editText.setText("");
+                        TextView phototext=getView().findViewById(R.id.photourl_text);
+                        phototext.setText("첨부된 사진 없음" );
+                        EditText editText=getView().findViewById(R.id.edit_Text);
+                        editText.setText("");
+                    }
+                    else
+                        Toast.makeText(getContext(),"이미 업로드했거나, 달성하지 않은 일정입니다.",Toast.LENGTH_SHORT).show();
                 }
                 else{
-                    Toast.makeText(getContext(),"이미 업로드했거나, 달성하지 않은 일정입니다.",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(),"오늘 일정만 업로드 할 수 있습니다.",Toast.LENGTH_SHORT).show();
                 }
-                break;
         }
         return super.onContextItemSelected(item);
     }
