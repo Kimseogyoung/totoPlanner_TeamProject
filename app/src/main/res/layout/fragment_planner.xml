@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="등록된 일정이 없습니다."
-        android:layout_margin="80dp"
+        android:layout_marginTop="150dp"
         android:gravity="center"
         android:visibility="invisible"/>
 
