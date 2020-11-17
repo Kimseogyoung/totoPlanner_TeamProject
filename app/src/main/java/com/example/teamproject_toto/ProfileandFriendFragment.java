@@ -403,6 +403,7 @@ public class ProfileandFriendFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 plantap.setVisibility(View.INVISIBLE);
+                text.setText("");
             }
         });
         db.collection("users").document(usercode)
@@ -419,27 +420,17 @@ public class ProfileandFriendFragment extends Fragment {
                                                        ArrayList<Boolean> list2 = (ArrayList<Boolean>) document.get("cv");
                                                        String str="";
                                                        if(list!=null){
+                                                           
                                                            for (int i=0; i<list.size();i++) {
                                                                str += " "+(list2.get(i)?" ✔":"❌")+"  "+list.get(i)+"\n";
                                                            }
                                                            text.setText(str);
                                                        }
-
-
+                                                       else  text.setText("오늘 일정이 없습니다.");
                                                    }
                                                }
                                            }
                 });
-
-
-
-
-
-
-
-
-
-
     }
 
     private static final int PICK_FROM_CAMERA = 0;
