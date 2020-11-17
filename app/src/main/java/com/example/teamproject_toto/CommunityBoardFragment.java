@@ -202,7 +202,6 @@ public class CommunityBoardFragment extends Fragment {
 
             db.collection(kinds).document(ss).set(communityboardInfo);
 
-            cboardList.add(communityboardInfo);
         }
 
     }
