@@ -1,26 +1,38 @@
 package com.example.teamproject_toto;
 
 public class TimelineboardInfo {
-    int icon=0;
+    String writercode;
     String name;
     String date;
     String title="";
-    int img=0;
+    String img="";
     String content="";
+    String id="";
 
-    public TimelineboardInfo( String name, String date, String title, int img, String content){
+    public TimelineboardInfo(String writercode ,String name, String date, String title, String img, String content,String id){
+        this.writercode=writercode;
         this.name=name;
         this.date=date;
         this.title=title;
         this.img=img;
         this.content=content;
-    }
-    public int getIcon() {
-        return icon;
+        this.id=id;
     }
 
-    public void setIcon(int icon) {
-        this.icon = icon;
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getWritercode() {
+        return writercode;
+    }
+
+    public void setWritercode(String writercode) {
+        this.writercode = writercode;
     }
 
     public String getName() {
@@ -39,11 +51,11 @@ public class TimelineboardInfo {
         this.date = date;
     }
 
-    public int getImg() {
+    public String getImg() {
         return img;
     }
 
-    public void setImg(int img) {
+    public void setImg(String img) {
         this.img = img;
     }
 

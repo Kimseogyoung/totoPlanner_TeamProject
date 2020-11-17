@@ -24,7 +24,6 @@ public class loginActivity extends Activity {
     protected void onCreate(Bundle saveInstanceState){
         super.onCreate(saveInstanceState);
         setContentView(R.layout.login);
-        setTitle("회원가입");
 
         findViewById(R.id.login_btn).setOnClickListener(onClickListener);
         findViewById(R.id.gotoSignup_btn).setOnClickListener(onClickListener);
@@ -66,8 +65,7 @@ public class loginActivity extends Activity {
                                 // Sign in success, update UI with the signed-in user's information
                                 startToast("로그인에 성공했습니다.");
                                 FirebaseUser user = mAuth.getCurrentUser();
-                                finish();
-                                //myStartActivity(MainActivity.class);
+                                myStartActivity(MainActivity.class);
 
                             } else {
                                 // If sign in fails, display a message to the user.

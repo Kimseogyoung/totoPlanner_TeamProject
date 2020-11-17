@@ -3,7 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="#98D6EF">
 
     <TextView
         android:layout_width="match_parent"
@@ -11,32 +12,37 @@
         android:layout_margin="20dp"
         android:gravity="center"
         android:text="회원가입"
-        android:textSize="30dp"
+        android:textSize="40dp"
+        android:textColor="#F8F2C2"
         android:textStyle="bold" />
 
     <EditText
+
         android:id="@+id/signup_email"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
+        android:background="#ffffff"
         android:ems="10"
         android:inputType="textEmailAddress"
-        android:layout_margin="5dp"
+        android:layout_margin="10dp"
         android:hint="이메일(아이디)"/>
 
     <EditText
         android:id="@+id/signup_password"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
+        android:background="#ffffff"
         android:ems="10"
         android:inputType="textPassword"
-        android:layout_margin="5dp"
+        android:layout_margin="10dp"
         android:hint="비밀번호"/>
 
     <EditText
         android:id="@+id/signup_password2"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="5dp"
+        android:layout_height="50dp"
+        android:background="#ffffff"
+        android:layout_margin="10dp"
         android:ems="10"
         android:hint="비밀번호 확인"
         android:inputType="textPassword" />
@@ -44,8 +50,9 @@
     <EditText
         android:id="@+id/signup_name"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="5dp"
+        android:layout_height="50dp"
+        android:background="#ffffff"
+        android:layout_margin="10dp"
         android:ems="10"
         android:hint="이름"
         android:inputType="textPersonName" />
@@ -53,19 +60,22 @@
     <EditText
         android:id="@+id/signup_number"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="5dp"
+        android:layout_height="50dp"
+        android:background="#ffffff"
+        android:layout_margin="10dp"
         android:ems="10"
         android:hint="전화번호"
         android:inputType="phone" />
 
     <Button
         android:id="@+id/signup_btn"
+        android:background="@drawable/buttons"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
         android:text="회원가입" />
     <Button
+        android:background="@drawable/buttons"
         android:id="@+id/gotoLogin_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

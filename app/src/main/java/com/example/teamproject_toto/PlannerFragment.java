@@ -1,11 +1,13 @@
 package com.example.teamproject_toto;
 
 import android.app.Activity;
+import android.content.ClipData;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -21,6 +23,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -40,9 +43,12 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.remote.Datastore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -62,21 +68,27 @@ import static androidx.constraintlayout.motion.utils.Oscillator.TAG;
 
 public class PlannerFragment extends Fragment {
 
+    private static final String TAG="PlannerActivity";
+
     // 현재 날짜 저장
-    Date today = new Date();
+    static Date today = new Date();
     // date_tv 전역변수로
     TextView date_tv;
     // 유저의 파이어 베이스
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-    // 리스트뷰에 추가할 리스트
-    static ArrayList<String> items = new ArrayList<String>();
+
+    // 리스트뷰에 추가할 리스트, 체크상태 표시할 리스트
+    ArrayList<PlannerItems> items = new ArrayList<PlannerItems>();
     //리스트뷰
     ListView plan_list;
 
+
+    Bitmap photo;
     String username;
+    int planidx;
     String planname;
-    boolean planPlckmode=false;
+    ArrayList<String> userFriends=new ArrayList<String>();
 
     @Nullable
     @Override
@@ -97,7 +109,9 @@ public class PlannerFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         Initialize();
-        plan_list = getView().findViewById(R.id.plan_list);//리사이클러뷰
+        plan_list = getView().findViewById(R.id.plan_list);//리스트뷰
+        loadUsername();
+        loadUserFriends();
 
         //게시글작성탭 내용
         final EditText popupText=getView().findViewById(R.id.edit_Text);
@@ -119,29 +133,42 @@ public class PlannerFragment extends Fragment {
 //         리스트뷰 컨텍스트 추가
         registerForContextMenu(plan_list);
 
-        ImageButton planUpload_btn = (ImageButton)getView().findViewById(R.id.planCheck_btn);//업로드할 일정 선택
+        ImageButton random_btn = (ImageButton)getView().findViewById(R.id.random_btn);//랜덤 소확행
         Button photoUpload_btn = (Button)getView().findViewById(R.id.photoupload_btn);//사진선택 버튼
         Button write_btn =(Button)getView().findViewById(R.id.upload_btn);//게시글 업로드
         Button exit_btn= (Button)getView().findViewById(R.id.uploadtapExit_btn);//창닫기
-        planUpload_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                planPlckmode = true;//일정 선택 모드 활성화
-                Toast.makeText(getContext(),"업로드할 일정을 선택하세요",Toast.LENGTH_SHORT).show();
-            }
-        });
+
+
         photoUpload_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 openPhotoPopup();
             }
         });
+
         write_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                items.get(planidx).setUploaded(true);
+                DataStore();
+
+                SimpleDateFormat format = new SimpleDateFormat("yyyy년 MM 월 dd일 hh:mm:ss");
+                Date now = new Date();
+                String ss = format.format(now);
+
+                SimpleDateFormat format2 = new SimpleDateFormat("yyyyMMddhhmmss");
+                String ss2 = format2.format(now);
                 getView().findViewById(R.id.uploadTap).setVisibility(View.INVISIBLE);
-                writeTimelinedata(username,"1월1일",planname+"달성 완료!",
-                        0,popupText.getText().toString());
+
+                uploadPhoto(photo,ss2+username);
+                String title = "\"" + planname + "\" 달성 완료!";
+                writemyTimelinedata(username,ss, title,
+                        ss2+username,popupText.getText().toString(),ss2);
+                //loadUserFriends();
+                writeFriendsTimelinedata(username,ss,title,
+                        ss2+username,popupText.getText().toString(),ss2);
+
 
 
             }
@@ -153,21 +180,43 @@ public class PlannerFragment extends Fragment {
             }
         });
 
-        //리스트뷰 아이템클릭이벤트 리스너 (왜 안될까?@@@@@@@@@@@)
-        plan_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        //random_btn -> 하루 한 번만 하게 하는 거랑, 삭제하면 다시 할 수 있게 하는 거 추가@@@@@
+        random_btn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if(planPlckmode==true){
-                    if(true){//나중에 체크박스(일정달성여부) 체크되었는지 확인해야함@@@@@@@@@@@@@@@@@
-                        planPlckmode=false;
-                        planname=items.get(position);//선택한일정내용
-                        getView().findViewById(R.id.uploadTap).setVisibility(View.VISIBLE);
-                    }
+            public void onClick(View view) {
+                RandomList randomList = new RandomList();
+                String random = "😁 " + randomList.getRandomitem();
+
+                ArrayList<String> temp = new ArrayList<String>();
+                for (PlannerItems plannerItems : items){
+                    temp.add(plannerItems.getText());
                 }
+
+                if (!temp.contains(random)){
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
+                    if (simpleDateFormat.format(today).equals(simpleDateFormat.format(new Date()))){
+
+                        AlertDialog.Builder dlg = new AlertDialog.Builder(getContext());
+                        dlg.setTitle("오늘의 소확행은?"); //제목
+
+                        // 아이템에 넣어주기
+                        PlannerItems item = new PlannerItems(random, false,false);
+
+                        items.add(item);
+                        DataStore();
+                        adapterSet();
+
+                        dlg.setMessage(random); // 메시지
+                        dlg.show();
+
+                    } else Toast.makeText(getContext(),"소확행은 오늘만!",Toast.LENGTH_SHORT).show();
+
+                } else Toast.makeText(getContext(),"소확행은 한번만!",Toast.LENGTH_SHORT).show();
+
             }
         });
-
     }
+
 
 
     public void Initialize(){
@@ -220,47 +269,50 @@ public class PlannerFragment extends Fragment {
                 map.put("list", items);
                 db.collection("users").document(user.getUid())
                         .collection("planner").document(ss).set(map);
+                ItemEmpty();
                 break;
 
             case R.id.edit_item:
                 final LinearLayout item_menu = getActivity().findViewById(R.id.item_menu);
                 item_menu.setVisibility(View.VISIBLE);
-                Button edit_btn = getView().findViewById(R.id.edit_btn);
+                final ImageButton edit_btn = getView().findViewById(R.id.edit_btn);
 
                 edit_btn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         EditText edit_et = getView().findViewById(R.id.edit_et);
                         if (edit_et.getText().length() > 0){
-                            items.set(index, edit_et.getText().toString());
+                            //PlannerItems item = new PlannerItems(edit_et.getText().toString(), false);
+                            PlannerItems item = new PlannerItems(edit_et.getText().toString(), false,false);
+                            items.set(index, item);
                         }
                         edit_et.setText("");
+                        DataStore();
                         adapterSet();
-
-                        SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
-                        String ss = format.format(today);
-                        Map<String, Object> map = new HashMap<String, Object>();
-                        map.put("list", items);
-                        db.collection("users").document(user.getUid())
-                                .collection("planner").document(ss).set(map);
                         item_menu.setVisibility(View.INVISIBLE);
                     }
                 });
                 break;
+
+            case R.id.upload_item:
+                if(items.get(index).getCv() && !items.get(index).getUploaded()){// 체크박스(일정달성여부) 체크되었는지 확인해야함@@@@@@@@@@@@@@@@@
+
+                    planidx=index;
+                    planname = items.get(index).getText();//선택한일정내용
+                    getView().findViewById(R.id.uploadTap).setVisibility(View.VISIBLE);
+
+                    TextView phototext=getView().findViewById(R.id.photourl_text);
+                    phototext.setText("첨부된 사진 없음" );
+                    EditText editText=getView().findViewById(R.id.edit_Text);
+                    editText.setText("");
+                }
+                else{
+                    Toast.makeText(getContext(),"이미 업로드했거나, 달성하지 않은 일정입니다.",Toast.LENGTH_SHORT).show();
+                }
+                break;
         }
         return super.onContextItemSelected(item);
     }
-
-    public void adapterSet(){
-        PlannerAdapter adapter = new PlannerAdapter();
-
-        for (String str : items){
-            adapter.addItem(str);
-        }
-
-        plan_list.setAdapter(adapter);
-    }
-
 
     View.OnClickListener Editing = new View.OnClickListener() {
         @Override
@@ -269,62 +321,101 @@ public class PlannerFragment extends Fragment {
             String st = plan_edit.getText().toString();
 
             if (st.length() > 0){
-
-                items.add(st);
-                adapterSet();
-
+                PlannerItems item = new PlannerItems(st, false,false);
+                items.add(item);
 
                 plan_edit.setText("");
 
                 DataStore();
+                ItemEmpty();
+                adapterSet();
             }
         }
     };
 
+    public void adapterSet(){
+        PlannerAdapter adapter = new PlannerAdapter();
+
+        for (int i = 0; i < items.size(); i++){
+            adapter.addItem(items.get(i));
+        }
+
+        plan_list.setAdapter(adapter);
+    }
+
+    public void ItemEmpty(){
+
+        if (items.isEmpty()){
+            getView().findViewById(R.id.noPlan).setVisibility(View.VISIBLE);
+        } else getView().findViewById(R.id.noPlan).setVisibility(View.INVISIBLE);
+
+    }
 
     public void DataStore(){
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
         String ss = format.format(today);
 
-        Map<String, Object> map = new HashMap<String, Object>();
-        map.put("list", items);
+        ArrayList<String> textlist = new ArrayList<String>();
+        ArrayList<Boolean> cvlist = new ArrayList<Boolean>();
+        ArrayList<Boolean> uplist = new ArrayList<Boolean>();
+
+        for (PlannerItems item : items){
+            textlist.add(item.getText());
+            cvlist.add(item.getCv());
+            uplist.add(item.getUploaded());
+        }
+
+        Map map = new HashMap<String, ArrayList>();
+        map.put("text", textlist);
+        map.put("cv", cvlist);
+        map.put("uploaded",uplist);
+
 
         db.collection("users").document(user.getUid())
                 .collection("planner").document(ss).set(map);
+
 
     }
 
     public void DataLoad(){
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
-        String ss = format.format(today);
+        final String ss = format.format(today);
 
         DocumentReference docRef = db.collection("users").document(user.getUid())
                 .collection("planner").document(ss);
+
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     if (document != null) {
-                        ArrayList<String> list = (ArrayList<String>) document.get("list");
+
+                        ArrayList<String> list = (ArrayList<String>) document.get("text");
+                        ArrayList<Boolean> clist = (ArrayList<Boolean>) document.get("cv");
+                        ArrayList<Boolean> ulist = (ArrayList<Boolean>) document.get("uploaded");
 
                         plan_list = getView().findViewById(R.id.plan_list);
 
-                        if (list != null) {
-                            for (String str : list) {
-                                items.add(str);
-                            }
-                            adapterSet();
-                        } else adapterSet();
-
+                        if (list != null && clist != null) {
+                            if (list.size() == clist.size()){
+                                for (int i = 0; i < list.size(); i++){
+                                    PlannerItems item = new PlannerItems(list.get(i), clist.get(i),ulist.get(i));
+                                    items.add(item);
+                                }
+                            } else Log.d(TAG, "크기 다름 이상");
+                        } else Log.d(TAG, "list/clist/ulist 비었음");
                     } else {
                         Log.d(TAG, "no such file");
                     }
                 } else {
                     Log.d(TAG, "get failed with ", task.getException());
                 }
+                ItemEmpty();
+                adapterSet();
             }
         });
+
     }
 
 
@@ -363,33 +454,31 @@ public class PlannerFragment extends Fragment {
 
 
     private void openPhotoPopup(){
-        Log.e("hi","누름");
-        DialogInterface.OnClickListener cameraListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                takePicture();
-            }
-        };
-        DialogInterface.OnClickListener albumListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                takeAlbum();
-            }
-        };
-        DialogInterface.OnClickListener cancelListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        };
 
-        new AlertDialog.Builder(getContext())
-                .setTitle("업로드할 이미지 선택")
-                .setPositiveButton("사진촬영", cameraListener)
-                .setNeutralButton("앨범선택", albumListener)
-                .setNegativeButton("취소", cancelListener)
-                .show();
+        final CharSequence[] list={"사진촬영","앨범선택","취소"};
 
+        AlertDialog.Builder alertDialogBulider=new AlertDialog.Builder(getContext());
+
+        alertDialogBulider.setTitle("업로드 할 사진 선택");
+        alertDialogBulider.setItems(list, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                switch (i){
+                    case 0://사진촬영
+                        takePicture();
+                        break;
+                    case 1://앨범에서 선택
+                        takeAlbum();
+                        break;
+                    case 2://취소
+                        dialogInterface.dismiss();
+                        break;
+                }
+                dialogInterface.dismiss();
+            }
+        });
+        AlertDialog alertDialog = alertDialogBulider.create();
+        alertDialog.show();
     }
     private static final int PICK_FROM_CAMERA = 0;
     private static final int PICK_FROM_ALBUM = 1;
@@ -419,9 +508,11 @@ public class PlannerFragment extends Fragment {
             try {
                 // 선택한 이미지에서 비트맵 생성
                 InputStream in = getActivity().getContentResolver().openInputStream(data.getData());
-                Bitmap photo = BitmapFactory.decodeStream(in);
+                photo = BitmapFactory.decodeStream(in);
                 in.close();
-                uploadPhoto(photo,"album");
+                TextView phototext=getView().findViewById(R.id.photourl_text);
+                phototext.setText("사진첨부 완료" );
+
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -430,26 +521,27 @@ public class PlannerFragment extends Fragment {
         else if(requestCode==PICK_FROM_CAMERA){
             final Bundle extras = data.getExtras();
             if(extras!=null){
-                Bitmap photo = extras.getParcelable("data");
-                uploadPhoto(photo,"camera");
+                photo = extras.getParcelable("data");
+                TextView phototext=getView().findViewById(R.id.photourl_text);
+                phototext.setText("사진첨부 완료" );
             }
 
         }
 
     }
-    private void uploadPhoto(final Bitmap photo, String name){
+    private void uploadPhoto(final Bitmap phot, String name){
 
 
-        if(photo != null)
+        if(phot != null)
         {
             FirebaseStorage storage = FirebaseStorage.getInstance();
 
             StorageReference storageRef = storage.getReference();
-            StorageReference ImagesRef = storageRef.child("images/"+name+"jpg");
+            StorageReference ImagesRef = storageRef.child("images/"+name);
 
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            photo.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+            phot.compress(Bitmap.CompressFormat.JPEG, 100, baos);
             byte[] datata = baos.toByteArray();
 
             UploadTask uploadTask = ImagesRef.putBytes(datata);
@@ -462,24 +554,27 @@ public class PlannerFragment extends Fragment {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                     // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
-                    TextView phototext=getView().findViewById(R.id.photourl_text);
-                    phototext.setText("사진첨부 완료" );
                 }
             });
 
         }
     }
-    private void writeTimelinedata(String name, String data,String title, int img,String content){
-        TimelineboardInfo timelineboardInfo=new TimelineboardInfo(name, data,title,img,content);
+    private void writemyTimelinedata(String name, String data,String title, String img,String content,String docuName){
+
+        TimelineboardInfo timelineboardInfo=new TimelineboardInfo(user.getUid(),name, data,title,img,content,docuName);
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         if(user!=null){
+
+            db.collection("user-timeline").document(user.getUid())
+                    .collection("timeline").document(docuName).set(timelineboardInfo);
             db.collection("users").document(user.getUid())
-                    .collection("timeline").document("201101121212").set(timelineboardInfo)
+                    .collection("timeline").document(docuName).set(timelineboardInfo)
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
                             Toast.makeText(getContext(),"업로드에 성공했습니다",Toast.LENGTH_SHORT).show();
+
                         }
 
                     })
@@ -493,6 +588,65 @@ public class PlannerFragment extends Fragment {
                     });
         }
 
+
+    }
+    private  void writeFriendsTimelinedata(String name, String data,String title, String img,String content,String docuName){
+
+        TimelineboardInfo timelineboardInfo=new TimelineboardInfo(user.getUid(),name, data,title,img,content,docuName);
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        if(userFriends!=null){
+            for(String friend : userFriends){
+                db.collection("user-timeline").document(friend)
+                        .collection("timeline").document(docuName).set(timelineboardInfo);
+            }
+        }
+    }
+    private void loadUsername(){
+        DocumentReference docRef = db.collection("users").document(user.getUid());
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document != null) {
+                        username = (String) document.get("name");
+                    } else {
+                        Log.d(TAG, "No such document");
+                    }
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                }
+            }
+        });
+    }
+
+
+    private void loadUserFriends(){
+
+        DocumentReference docRef = db.collection("users").document(user.getUid());
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document != null) {
+                        ArrayList<String> list = (ArrayList<String>) document.get("friends");
+                        if (list != null){
+                            for (String str : list){
+                                Log.d(TAG, "add"+str);
+                                userFriends.add(str);
+                            }
+                        }
+                    } else {
+                        Log.d(TAG, "No such document");
+                    }
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                }
+            }
+        });
     }
 
 }

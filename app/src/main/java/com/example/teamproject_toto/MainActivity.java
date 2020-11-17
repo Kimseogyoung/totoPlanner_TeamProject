@@ -16,14 +16,15 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 public class MainActivity extends AppCompatActivity {
-    TimelineFragment timelineFragment = new TimelineFragment();
-
     private static final String TAG="MainActivity";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+
+
 
         //사진찍기 권한
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -41,16 +42,22 @@ public class MainActivity extends AppCompatActivity {
         }
         else{
             //로그인되어있으면 현재화면 유지
+            PlannerFragment fragment1 = new PlannerFragment();
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.replace(R.id.mainFrame, fragment1);
+            transaction.commit();
 
-            //아직 데이터베이스에 저장한 내용 받아오는거 없음 추가예정일듯
         }
 
         findViewById(R.id.planner_btn).setOnClickListener(onClickListener);
         findViewById(R.id.timeline_btn).setOnClickListener(onClickListener);
         findViewById(R.id.community_btn).setOnClickListener(onClickListener);
+        findViewById(R.id.profileFriend_btn).setOnClickListener(onClickListener);
 
 
     }
+
+
 
     View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
@@ -70,11 +77,17 @@ public class MainActivity extends AppCompatActivity {
                     break;
 
                 case R.id.community_btn:
-//                    CommunityFragment fragment = new CommunityFragment();
-//                    transaction.replace(R.id.mainFrame, fragment);
-//                    transaction.commit();
-                    FirebaseAuth.getInstance().signOut();//로그아웃
-                    myStartActivity(loginActivity.class);
+                     CommunityFragment fragment = new CommunityFragment();
+                    transaction.replace(R.id.mainFrame, fragment);
+                    transaction.commit();
+
+                    break;
+
+                case R.id.profileFriend_btn:
+                    ProfileandFriendFragment fragment4 = new ProfileandFriendFragment();
+
+                    transaction.replace(R.id.mainFrame, fragment4);
+                    transaction.commit();
                     break;
             }
         }

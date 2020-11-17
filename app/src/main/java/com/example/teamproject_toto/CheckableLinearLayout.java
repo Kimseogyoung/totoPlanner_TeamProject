@@ -32,6 +32,7 @@ public class CheckableLinearLayout extends LinearLayout implements Checkable {
         CheckBox cb = (CheckBox) findViewById(R.id.pitem_cb) ;
 
         setChecked(cb.isChecked() ? false : true) ;
+//        setChecked(cb.isChecked() ? true : false);
         // setChecked(mIsChecked ? false : true) ;
     }
 

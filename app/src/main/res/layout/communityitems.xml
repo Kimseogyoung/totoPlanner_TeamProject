@@ -4,30 +4,24 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    >
+    android:background="@drawable/friends"
+    android:layout_marginTop="10dp"
+    android:orientation="vertical">
 
     <LinearLayout
+        android:layout_marginLeft="5dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         >
 
-        <ImageView
-            android:id="@+id/item_icon"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_margin="5dp"
-            tools:srcCompat="@tools:sample/avatars" />
-
         <LinearLayout
-
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             >
 
             <TextView
-                android:id="@+id/item_name"
+                android:id="@+id/citem_nickname"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
 
@@ -36,7 +30,7 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/item_date"
+                android:id="@+id/citem_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="1월 1일 13:20" />
@@ -44,42 +38,38 @@
     </LinearLayout>
 
     <TextView
-        android:id="@+id/item_title"
+        android:id="@+id/citem_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
         android:text="title title title title title title"
-        android:textSize="28dp"
+        android:textSize="30dp"
         android:textStyle="bold" />
 
-    <ImageView
-        android:id="@+id/item_img"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:layout_margin="5dp"
-        tools:srcCompat="@tools:sample/avatars"
-        android:background="#EDEDED"/>
 
     <TextView
-        android:id="@+id/item_content"
+        android:id="@+id/citem_content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
         android:text="content"
         android:textSize="20dp" />
 
     <LinearLayout
+        android:layout_marginTop="10dp"
         android:layout_width="match_parent"
-        android:layout_height="30dp"
-        >
+        android:layout_height="40dp">
 
-        <Button
-            android:id="@+id/comment_btn"
+        <TextView
+            android:id="@+id/comment_cnt"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="#8DB2DD"
+            android:background="@drawable/ctitle"
+            android:textSize="15dp"
+            android:gravity="center"
             android:text="댓글" />
     </LinearLayout>
 
