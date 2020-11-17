@@ -104,7 +104,7 @@
     <LinearLayout
         android:id="@+id/edit_commentTab"
         android:layout_gravity="center"
-        android:layout_width="300dp"
+        android:layout_width="350dp"
         android:layout_height="80dp"
         android:orientation="horizontal"
         android:background="#CCCCCC"
@@ -125,6 +125,15 @@
             android:text="작성"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
+
+        <ImageButton
+            android:id="@+id/ccancle_btn"
+            android:layout_marginLeft="10dp"
+            android:layout_gravity="center"
+            android:background="#00FFFFFF"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/exit_icon"/>
 
 
     </LinearLayout>
