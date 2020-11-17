@@ -139,7 +139,7 @@ public class TimelineFragment extends Fragment {
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                SimpleDateFormat format = new SimpleDateFormat("MM월 dd일 hh:mm:ss");
+                SimpleDateFormat format = new SimpleDateFormat("MM월 dd일 HH:mm:ss");
                 Date now = new Date();
                 final String ss = format.format(now);
 
