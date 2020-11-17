@@ -174,7 +174,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:text=""
-                android:textSize="17dp"
+                android:textSize="15dp"
                 />
         </ScrollView>
 
