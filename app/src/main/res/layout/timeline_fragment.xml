@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+
+    >
+    <TextView
+        android:id="@+id/noTimeline"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="타임라인에 게시글이 없습니다."
+        android:layout_margin="20dp"
+        android:gravity="center"
+        android:visibility="invisible"/>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/timelineView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        />
+    <LinearLayout
+        android:id="@+id/timeline_commentTap"
+        android:layout_width="match_parent"
+        android:layout_height="350dp"
+        android:layout_gravity="bottom"
+        android:visibility="invisible"
+        android:orientation="vertical"
+        android:background="@drawable/uploadtap"
+        >
+        <TextView
+            android:id="@+id/timeline_commentTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="댓글"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:textSize="20dp"
+            android:layout_margin="10dp"
+            android:gravity="center"
+            />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_margin="10dp"
+            android:background="#8FA4BA">
+            <EditText
+                android:id="@+id/timeline_commentedit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="댓글"
+                android:layout_weight="5" />
+            <Button
+                android:id="@+id/timeline_commentupload"
+                android:layout_weight="1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="작성"/>
+
+        </LinearLayout>
+
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="15dp">
+
+            <TextView
+                android:id="@+id/timeline_comment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:text=""
+                android:textColor="#ffffff"
+                android:textSize="18dp" />
+        </ScrollView>
+    </LinearLayout>
+
+
+
+</FrameLayout>

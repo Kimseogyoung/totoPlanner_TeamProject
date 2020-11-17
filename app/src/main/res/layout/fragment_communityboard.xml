@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/community_title"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/ctitle"
+            android:gravity="center"
+            android:text="커뮤니티 게시판 이름"
+            android:textSize="35dp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/communityboard_view"
+            android:layout_width="match_parent"
+            android:layout_height="500dp" />
+
+        <GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/refresh_btn"
+                android:background="@drawable/buttons"
+                android:layout_row="0"
+                android:layout_columnWeight="1"
+                android:layout_column="0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="새로고침"/>
+
+            <Button
+                android:id="@+id/cupload_btn"
+                android:background="@drawable/buttons"
+                android:layout_width="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_row="0"
+                android:layout_column="1"
+                android:text="업로드" />
+
+            <Button
+                android:id="@+id/back"
+                android:layout_width="wrap_content"
+                android:background="@drawable/buttons"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_gravity="center"
+                android:layout_row="0"
+                android:layout_column="2"
+                android:text="뒤로가기" />
+
+        </GridLayout>
+    </LinearLayout>
+
+    // 게시글 업로드
+    <LinearLayout
+        android:id="@+id/cuploadTap"
+        android:layout_width="350dp"
+        android:layout_height="400dp"
+        android:layout_gravity="center"
+        android:background="@drawable/buttons"
+        android:orientation="vertical"
+        android:visibility="invisible">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="right">
+
+            <EditText
+                android:id="@+id/nickname_et"
+                android:layout_width="0dp"
+                android:layout_weight="10"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:layout_margin="10dp"
+                android:background="@drawable/contents"
+                android:hint="닉네임 작성"
+                android:gravity="center"/>
+
+            <ImageButton
+                android:id="@+id/cuploadtapExit_btn"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="left"
+                android:layout_marginTop="8dp"
+                android:layout_marginRight="15dp"
+                android:background="#00FFFFFF"
+                android:src="@drawable/exit_icon" />
+
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/ctitle_Text"
+            android:layout_width="280dp"
+            android:layout_height="15dp"
+            android:layout_margin="10dp"
+
+            android:layout_weight="1"
+            android:background="@drawable/contents"
+            android:hint="제목을 작성하세요"
+            android:padding="5dp" />
+
+
+        <EditText
+            android:layout_height="0dp"
+            android:layout_weight="6"
+            android:id="@+id/cedit_Text"
+            android:layout_width="280dp"
+
+            android:layout_margin="10dp"
+            android:padding="5dp"
+            android:background="@drawable/contents"
+            android:hint="내용을 작성하세요" />
+
+        <LinearLayout
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_margin="10dp"
+            android:gravity="right">
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="업로드"
+                android:background="@drawable/buttons"
+                android:id="@+id/cupload_real_btn"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/noBoard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="등록된 게시물이 없습니다."
+        android:layout_margin="80dp"
+        android:gravity="center"
+        android:visibility="invisible"/>
+
+
+
+
+</FrameLayout>
