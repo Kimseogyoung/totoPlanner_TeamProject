@@ -67,6 +67,8 @@ public class CommunityCommentFragment extends Fragment {
         edit_comment_btn.setOnClickListener(onClickListener);
         ImageButton exit_btn = view.findViewById(R.id.ccexit_btn);
         exit_btn.setOnClickListener(onClickListener);
+        ImageButton ccancle_btn = view.findViewById(R.id.ccancle_btn);
+        ccancle_btn.setOnClickListener(onClickListener);
 
         comment = view.findViewById(R.id.comment);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
@@ -88,7 +90,7 @@ public class CommunityCommentFragment extends Fragment {
                     EditText editText = getView().findViewById(R.id.comment_et);
                     if (editText.getText().length() > 0){
                         Date now = new Date();
-                        SimpleDateFormat format = new SimpleDateFormat("yyyy년 MM월 dd일 hh:mm:ss");
+                        SimpleDateFormat format = new SimpleDateFormat("yyyy년 MM월 dd일 HH:mm:ss");
                         String str = format.format(now);
 
                         CommunityCommentInfo info = new CommunityCommentInfo(str, editText.getText().toString());
@@ -105,6 +107,11 @@ public class CommunityCommentFragment extends Fragment {
                 case R.id.ccexit_btn:
                     Goback();
                     break;
+                case R.id.ccancle_btn:
+                EditText et = getView().findViewById(R.id.comment_et);
+                et.setText("");
+                getView().findViewById(R.id.edit_commentTab).setVisibility(View.INVISIBLE);
+                break;
             }
 
         }
