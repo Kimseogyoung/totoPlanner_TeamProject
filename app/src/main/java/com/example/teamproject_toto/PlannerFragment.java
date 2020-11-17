@@ -276,6 +276,18 @@ public class PlannerFragment extends Fragment {
                 final LinearLayout item_menu = getActivity().findViewById(R.id.item_menu);
                 item_menu.setVisibility(View.VISIBLE);
                 final ImageButton edit_btn = getView().findViewById(R.id.edit_btn);
+                
+                // 컨텍스트 편집 취소
+                ImageButton cancle_btn = getView().findViewById(R.id.cancel_btn);
+                cancle_btn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        EditText edit_et = getView().findViewById(R.id.edit_et);
+                        edit_et.setText("");
+                        item_menu.setVisibility(View.INVISIBLE);
+
+                    }
+                });
 
                 edit_btn.setOnClickListener(new View.OnClickListener() {
                     @Override
