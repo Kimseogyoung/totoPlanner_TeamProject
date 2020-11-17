@@ -173,7 +173,7 @@
                 android:id="@+id/plantap_text"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:text="오늘 일정이 없습니다."
+                android:text=""
                 android:textSize="17dp"
                 />
         </ScrollView>
