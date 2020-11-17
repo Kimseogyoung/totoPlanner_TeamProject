@@ -140,7 +140,7 @@ public class CommunityBoardFragment extends Fragment {
                     String title = cedit_title.getText().toString();
 
                     if (nickname.length() > 0 && cedit_text.length() > 0 && cedit_title.length() > 0){
-                        SimpleDateFormat format = new SimpleDateFormat("yyyy년 MM월 dd일 hh:mm:ss");
+                        SimpleDateFormat format = new SimpleDateFormat("yyyy년 MM월 dd일 HH:mm:ss");
                         String ss = format.format(new Date());
 
                         writemyCommunitydata(nickname,ss,title,str);
@@ -197,7 +197,7 @@ public class CommunityBoardFragment extends Fragment {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         if(user!=null){
-            SimpleDateFormat format = new SimpleDateFormat("yyyy년 MM월 dd일 hh:mm:ss");
+            SimpleDateFormat format = new SimpleDateFormat("yyyy년 MM월 dd일 HH:mm:ss");
             String ss = format.format(new Date());
 
             db.collection(kinds).document(ss).set(communityboardInfo);
