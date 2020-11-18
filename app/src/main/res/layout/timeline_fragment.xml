@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="타임라인에 게시글이 없습니다."
-        android:layout_margin="20dp"
+        android:layout_marginTop="80dp"
         android:gravity="center"
         android:visibility="invisible"/>
     <androidx.recyclerview.widget.RecyclerView
@@ -22,7 +22,7 @@
     <LinearLayout
         android:id="@+id/timeline_commentTap"
         android:layout_width="match_parent"
-        android:layout_height="350dp"
+        android:layout_height="400dp"
         android:layout_gravity="bottom"
         android:visibility="invisible"
         android:orientation="vertical"

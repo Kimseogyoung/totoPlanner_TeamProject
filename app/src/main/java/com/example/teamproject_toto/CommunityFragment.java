@@ -3,6 +3,7 @@ package com.example.teamproject_toto;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.view.LayoutInflater;
@@ -10,7 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-public class CommunityFragment extends Fragment {
+public class CommunityFragment extends Fragment implements onBackPressedListener {
 
 
     @Override
@@ -69,6 +70,17 @@ public class CommunityFragment extends Fragment {
         }
     };
 
+    public void GoBack(){
+        PlannerFragment fragment1=new PlannerFragment();
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.mainFrame,fragment1).commit();
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        GoBack();
+    }
 
 
 

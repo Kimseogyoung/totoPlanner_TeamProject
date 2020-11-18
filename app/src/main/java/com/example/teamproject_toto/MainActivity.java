@@ -10,10 +10,13 @@ import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG="MainActivity";
@@ -98,6 +101,18 @@ public class MainActivity extends AppCompatActivity {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
     }
+    public void onBackPressed() {
+
+        //프래그먼트 onBackPressedListener사용
+        List<Fragment> fragmentList = getSupportFragmentManager().getFragments();
+        for (Fragment fragment : fragmentList) {
+            if (fragment instanceof onBackPressedListener) {
+                ((onBackPressedListener) fragment).onBackPressed();
+                return;
+            }
+        }
+    }
+
 
 
 }

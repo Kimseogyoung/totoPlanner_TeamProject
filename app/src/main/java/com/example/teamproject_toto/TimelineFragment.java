@@ -16,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -39,7 +40,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class TimelineFragment extends Fragment {
+public class TimelineFragment extends Fragment implements onBackPressedListener{
     RecyclerView recyclerView;
     RecyclerView.LayoutManager layoutManager;
     RecyclerView.Adapter adapter;
@@ -139,7 +140,7 @@ public class TimelineFragment extends Fragment {
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                SimpleDateFormat format = new SimpleDateFormat("MM월 dd일 hh:mm:ss");
+                SimpleDateFormat format = new SimpleDateFormat("MM월 dd일 HH:mm:ss");
                 Date now = new Date();
                 final String ss = format.format(now);
 
@@ -204,4 +205,15 @@ public class TimelineFragment extends Fragment {
     }
 
 
+    public void GoBack(){
+        PlannerFragment fragment1=new PlannerFragment();
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.mainFrame,fragment1).commit();
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        GoBack();
+    }
 }

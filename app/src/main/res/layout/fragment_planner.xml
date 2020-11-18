@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="등록된 일정이 없습니다."
-        android:layout_margin="80dp"
+        android:layout_marginTop="150dp"
         android:gravity="center"
         android:visibility="invisible"/>
 
@@ -190,9 +190,8 @@
 
         <EditText
             android:id="@+id/edit_et"
-            android:layout_width="230dp"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:layout_gravity=""
             android:hint="편집할 내용을 쓰세요" />
 
 
@@ -203,6 +202,12 @@
             android:background="#00F1F1F1"
             android:src="@drawable/pencil_icon" />
 
+        <ImageButton
+            android:id="@+id/cancel_btn"
+            android:background="#00FFFFFF"
+            android:src="@drawable/exit_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
     </LinearLayout>
 
 </FrameLayout>

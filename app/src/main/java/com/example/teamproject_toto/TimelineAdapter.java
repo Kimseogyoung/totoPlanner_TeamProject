@@ -73,6 +73,7 @@ public class TimelineAdapter extends RecyclerView.Adapter<TimelineAdapter.ItemVi
                 @Override
                 public void onComplete(@NonNull Task<Uri> task) {
                     if (task.isSuccessful()) {
+                        holder.Img.setVisibility(View.VISIBLE);
                         // Glide 이용하여 이미지뷰에 로딩
                         Glide.with(context)
                                 .load(task.getResult())

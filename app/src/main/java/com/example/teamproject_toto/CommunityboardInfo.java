@@ -5,12 +5,14 @@ public class CommunityboardInfo {
     String title;
     String content;
     String date;
+    String img="";
 
-    public CommunityboardInfo(String nickname, String title, String content, String date){
+    public CommunityboardInfo(String nickname, String title, String content, String date, String img){
         this.nickname = nickname;
         this.title = title;
         this.content = content;
         this.date = date;
+        this.img = img;
     }
 
     // set Method
@@ -31,11 +33,14 @@ public class CommunityboardInfo {
         this.title = title;
     }
 
+    public void setImg(String img) {
+        this.img = img;
+    }
+
     // get method
     public String getContent() {
         return content;
     }
-
 
     public String getDate() {
         return date;
@@ -47,5 +52,9 @@ public class CommunityboardInfo {
 
     public String getTitle() {
         return title;
+    }
+
+    public String getImg() {
+        return img;
     }
 }

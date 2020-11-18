@@ -1,5 +1,7 @@
 package com.example.teamproject_toto;
 
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -8,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -17,6 +20,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -24,6 +28,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -32,7 +38,7 @@ import java.util.Date;
 import static androidx.constraintlayout.motion.utils.Oscillator.TAG;
 
 
-public class CommunityCommentFragment extends Fragment {
+public class CommunityCommentFragment extends Fragment implements onBackPressedListener{
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -43,6 +49,8 @@ public class CommunityCommentFragment extends Fragment {
     CommunityCommentAdapter adapter;
     ArrayList<CommunityCommentInfo> comments = new ArrayList<>();
 
+    Bitmap phot;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -52,6 +60,7 @@ public class CommunityCommentFragment extends Fragment {
         TextView date = view.findViewById(R.id.citem_date);
         TextView title = view.findViewById(R.id.citem_title);
         TextView content = view.findViewById(R.id.citem_content);
+        final ImageView img = view.findViewById(R.id.citem_img);
 
         if(getArguments() != null){
             nickname.setText(getArguments().getString("nickname"));
@@ -59,6 +68,28 @@ public class CommunityCommentFragment extends Fragment {
             date.setText(getArguments().getString("date"));
             content.setText(getArguments().getString("content"));
             kinds = getArguments().getString("kinds");
+
+            //FirebaseStorage 인스턴스를 생성
+            FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
+            // 위의 저장소를 참조하는 파일명으로 지정
+            StorageReference storageReference = firebaseStorage.getReference()
+                    .child(kinds+"/"+getArguments().getString("img"));
+            //StorageReference에서 파일 다운로드 URL 가져옴
+            storageReference.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+                @Override
+                public void onComplete(@NonNull Task<Uri> task) {
+                    if (task.isSuccessful()) {
+                        // Glide 이용하여 이미지뷰에 로딩
+                        Glide.with(getContext())
+                                .load(task.getResult())
+                                .into(img);
+                    } else {
+                        // URL을 가져오지 못하면
+                        img.setVisibility(View.GONE);
+                    }
+                }
+            });
+
         }
 
         Button comment_plus = view.findViewById(R.id.comment_plus);
@@ -67,6 +98,8 @@ public class CommunityCommentFragment extends Fragment {
         edit_comment_btn.setOnClickListener(onClickListener);
         ImageButton exit_btn = view.findViewById(R.id.ccexit_btn);
         exit_btn.setOnClickListener(onClickListener);
+        ImageButton ccancle_btn = view.findViewById(R.id.ccancle_btn);
+        ccancle_btn.setOnClickListener(onClickListener);
 
         comment = view.findViewById(R.id.comment);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
@@ -88,7 +121,7 @@ public class CommunityCommentFragment extends Fragment {
                     EditText editText = getView().findViewById(R.id.comment_et);
                     if (editText.getText().length() > 0){
                         Date now = new Date();
-                        SimpleDateFormat format = new SimpleDateFormat("yyyy년 MM월 dd일 hh:mm:ss");
+                        SimpleDateFormat format = new SimpleDateFormat("yyyy년 MM월 dd일 HH:mm:ss");
                         String str = format.format(now);
 
                         CommunityCommentInfo info = new CommunityCommentInfo(str, editText.getText().toString());
@@ -105,6 +138,11 @@ public class CommunityCommentFragment extends Fragment {
                 case R.id.ccexit_btn:
                     Goback();
                     break;
+                case R.id.ccancle_btn:
+                EditText et = getView().findViewById(R.id.comment_et);
+                et.setText("");
+                getView().findViewById(R.id.edit_commentTab).setVisibility(View.INVISIBLE);
+                break;
             }
 
         }
@@ -151,6 +189,11 @@ public class CommunityCommentFragment extends Fragment {
                     }
                 });
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        Goback();
     }
 
 }

@@ -55,7 +55,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class ProfileandFriendFragment extends Fragment {
+public class ProfileandFriendFragment extends Fragment implements onBackPressedListener {
     RecyclerView recyclerView;
     RecyclerView.LayoutManager layoutManager;
     RecyclerView.Adapter adapter;
@@ -118,7 +118,6 @@ public class ProfileandFriendFragment extends Fragment {
 
                     FirebaseAuth.getInstance().signOut();//로그아웃
 
-                    GoBack();
                     Intent intent = new Intent(getContext(), loginActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
@@ -132,12 +131,6 @@ public class ProfileandFriendFragment extends Fragment {
             }
         }
     };
-
-    public void GoBack(){
-        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-        fragmentManager.beginTransaction().remove(this).commit();
-    }
-
     private void setup(){//기본화면 업뎃,프로필업뎃,친구목록업뎃
 
 
@@ -403,6 +396,7 @@ public class ProfileandFriendFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 plantap.setVisibility(View.INVISIBLE);
+                text.setText("");
             }
         });
         db.collection("users").document(usercode)
@@ -419,27 +413,17 @@ public class ProfileandFriendFragment extends Fragment {
                                                        ArrayList<Boolean> list2 = (ArrayList<Boolean>) document.get("cv");
                                                        String str="";
                                                        if(list!=null){
+                                                           
                                                            for (int i=0; i<list.size();i++) {
                                                                str += " "+(list2.get(i)?" ✔":"❌")+"  "+list.get(i)+"\n";
                                                            }
                                                            text.setText(str);
                                                        }
-
-
+                                                       else  text.setText("오늘 일정이 없습니다.");
                                                    }
                                                }
                                            }
                 });
-
-
-
-
-
-
-
-
-
-
     }
 
     private static final int PICK_FROM_CAMERA = 0;
@@ -590,6 +574,17 @@ public class ProfileandFriendFragment extends Fragment {
             });
 
         }
+    }
+    public void GoBack(){
+        PlannerFragment fragment1=new PlannerFragment();
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.mainFrame,fragment1).commit();
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        GoBack();
     }
 
 }
