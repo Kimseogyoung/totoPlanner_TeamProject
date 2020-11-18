@@ -118,7 +118,7 @@ public class ProfileandFriendFragment extends Fragment {
 
                     FirebaseAuth.getInstance().signOut();//로그아웃
 
-                    GoBack();
+                   
                     Intent intent = new Intent(getContext(), loginActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
