@@ -24,15 +24,15 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.Map;
 
+//회원가입 액티비티
 public class signupActivity extends Activity {
     private FirebaseAuth mAuth;
-    private static final String TAG="SignupActivity";
+    private static final String TAG="SignupActivity";//디버깅 태그
 
     @Override
     protected void onCreate(Bundle saveInstanceState){
         super.onCreate(saveInstanceState);
         setContentView(R.layout.signup);
-        setTitle("회원가입");
 
         findViewById(R.id.signup_btn).setOnClickListener(onClickListener);
         findViewById(R.id.gotoLogin_btn).setOnClickListener(onClickListener);
@@ -41,46 +41,42 @@ public class signupActivity extends Activity {
 
     }
 
+    //클릭 이벤트리스너 등록
     View.OnClickListener onClickListener=new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             switch (view.getId()){
-                case R.id.signup_btn:
-                    signup();
+                case R.id.signup_btn://회원가입버튼 눌렀을때
+                    signup();//회원가입
                     break;
-                case R.id.gotoLogin_btn:
-                    myStartActivity(loginActivity.class);
+                case R.id.gotoLogin_btn://로그인버튼 눌렀을때
+                    myStartActivity(loginActivity.class);//로그인화면으로 이동
                     break;
 
             }
         }
     };
 
-
+    //회원가입 함수
     private void signup(){
-        final String name = ((EditText)findViewById(R.id.signup_name)).getText().toString();
-        final String phoneNumber = ((EditText)findViewById(R.id.signup_number)).getText().toString();
-        String email = ((EditText)findViewById(R.id.signup_email)).getText().toString();
-        String password = ((EditText)findViewById(R.id.signup_password)).getText().toString();
-        String passwordCheck = ((EditText)findViewById(R.id.signup_password2)).getText().toString();
+        final String name = ((EditText)findViewById(R.id.signup_name)).getText().toString();//회원정보 이름
+        final String phoneNumber = ((EditText)findViewById(R.id.signup_number)).getText().toString();//회원정보 전화번호
+        String email = ((EditText)findViewById(R.id.signup_email)).getText().toString();//회원정보 이메일(id)
+        String password = ((EditText)findViewById(R.id.signup_password)).getText().toString();//회원정보 비밀번호
+        String passwordCheck = ((EditText)findViewById(R.id.signup_password2)).getText().toString();//비밀번호 확인문자열
 
         if(name.length()>0 &&phoneNumber.length()>0 && email.length() > 0 && password.length() > 0 && passwordCheck.length() > 0){
-            if(password.equals(passwordCheck)){
+            //editText가 비어있을경우 if문 진입불가
+            if(password.equals(passwordCheck)){//비밀번호 확인이 맞는지 
                 mAuth.createUserWithEmailAndPassword(email, password)
-                        .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                        .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {//회원가입 
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 if (task.isSuccessful()) {
-                                    // Sign in success, update UI with the signed-in user's information
-                                    profileUpdate(name,phoneNumber);
-                                    //UI
+                                    profileUpdate(name,phoneNumber);///회원정보 등록 함수 호출
                                 } else {
-                                    // If sign in fails, display a message to the user.
                                     Toast.makeText(getApplicationContext(),task.getException().toString(),Toast.LENGTH_SHORT).show();
-                                    //UI
                                 }
-
-                                // ...
                             }
                         });
             }else{
@@ -91,21 +87,21 @@ public class signupActivity extends Activity {
         }
     }
 
+    //class c에 해당하는 액티비티로 이동하는 함수
     private void myStartActivity(Class c) {
         Intent intent = new Intent(this, c);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
     }
+    //데이터베이스에 회원정보 등록하는 함수
     private void profileUpdate(String name, String phoneNumber){
 
-        //데이터베이스에 회원정보 등록
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        String friendcode=randomPassword(6);
-        MemberInfo memberInfo =new MemberInfo(user.getUid(),name,user.getEmail(),phoneNumber,friendcode);
-
-        //1112추가
+        String friendcode=randomPassword(6);//친구코드 랜덤 생성
+        MemberInfo memberInfo =new MemberInfo(user.getUid(),name,user.getEmail(),phoneNumber,friendcode);//회원정보 등록
+        
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("id", user.getEmail());
 
@@ -118,7 +114,6 @@ public class signupActivity extends Activity {
                         public void onSuccess(Void aVoid) {
                             Toast.makeText(getApplicationContext(),"회원가입에 성공했습니다.",Toast.LENGTH_SHORT).show();
                         }
-
                     })
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
@@ -132,6 +127,7 @@ public class signupActivity extends Activity {
         }
     }
 
+    //랜덤으로 6자리의 친구코드를 생성하는 함수.
     public static String randomPassword (int length) {
         int index = 0;
         char[] charSet = new char[] {
