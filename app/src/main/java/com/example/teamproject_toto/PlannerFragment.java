@@ -139,14 +139,15 @@ public class PlannerFragment extends Fragment implements onBackPressedListener{
         Button exit_btn= (Button)getView().findViewById(R.id.uploadtapExit_btn);//창닫기
 
 
-        //사진 업로드버튼 클릭 이벤트리스너
+        //코드 작성자 : 김서경
+        //사진 업로드버튼 클릭 이벤트리스너 
         photoUpload_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 openPhotoPopup();
             }
         });
-        
+        //코드 작성자 : 김서경
         //타임라인 게시글 업로드버튼 클릭 이벤트리스너
         write_btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -175,6 +176,7 @@ public class PlannerFragment extends Fragment implements onBackPressedListener{
 
             }
         });
+        //코드 작성자 : 김서경
         //게시글 작성팝업 나가기 버튼 클릭 이벤트리스너 
         exit_btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -308,7 +310,8 @@ public class PlannerFragment extends Fragment implements onBackPressedListener{
                     }
                 });
                 break;
-
+            
+            //코드 작성자 : 김서경 
             case R.id.upload_item://업로드 버튼 클릭 시
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");//현재 날짜 문자열 받아와서
                 if (simpleDateFormat.format(today).equals(simpleDateFormat.format(new Date()))){//오늘이 아닐경우 false
@@ -471,7 +474,8 @@ public class PlannerFragment extends Fragment implements onBackPressedListener{
         }
     };
 
-
+    
+    //코드 작성자 : 김서경 
     //사진 선택 팝업창 열기
     private void openPhotoPopup(){
 
@@ -504,11 +508,13 @@ public class PlannerFragment extends Fragment implements onBackPressedListener{
     private static final int PICK_FROM_ALBUM = 1;
 
 
+    //코드 작성자 : 김서경 
     //카메라 촬영
     private void takePicture(){
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(intent, PICK_FROM_CAMERA);
     }
+    //코드 작성자 : 김서경 
     private void takeAlbum(){
         // 앨범 호출
         Intent intent = new Intent(Intent.ACTION_PICK);
@@ -517,6 +523,7 @@ public class PlannerFragment extends Fragment implements onBackPressedListener{
         startActivityForResult(intent, PICK_FROM_ALBUM);
     }
 
+    //코드 작성자 : 김서경 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         //카메라,앨범에서 사진선택후 결과값 받아오기
@@ -550,6 +557,7 @@ public class PlannerFragment extends Fragment implements onBackPressedListener{
         }
 
     }
+    //코드 작성자 : 김서경 
     //선택한 사진을 파이어베이스 storage에 업로드
     private void uploadPhoto(final Bitmap phot, String name){
         //phot - 사진 비트맵 , name - 저장될 사진의 이름
@@ -581,6 +589,7 @@ public class PlannerFragment extends Fragment implements onBackPressedListener{
 
         }
     }
+    //코드 작성자 : 김서경 
     //내 타임라인에 내 게시물 데이터 추가하기 함수
     //"users"컬렉션 -> user.uid문서 -> "timeline"컬렉션에 새 문서 추가
     private void writemyTimelinedata(String name, String data,String title, String img,String content,String docuName){
@@ -613,6 +622,7 @@ public class PlannerFragment extends Fragment implements onBackPressedListener{
 
 
     }
+    //코드 작성자 : 김서경 
     //친구 타임라인에 내 게시물 데이터 추가하기 함수
     //"users"컬렉션 -> 내 친구 문서 -> "timeline"컬렉션에 새 문서 추가
     private  void writeFriendsTimelinedata(String name, String data,String title, String img,String content,String docuName){
@@ -627,6 +637,7 @@ public class PlannerFragment extends Fragment implements onBackPressedListener{
             }
         }
     }
+    //코드 작성자 : 김서경 
     //데이터베이스에서 내 회원정보의 "name"필드 값 받아와서 username변수에 할당하는 함수
     private void loadUsername(){
         DocumentReference docRef = db.collection("users").document(user.getUid());
@@ -647,6 +658,7 @@ public class PlannerFragment extends Fragment implements onBackPressedListener{
         });
     }
 
+    //코드 작성자 : 김서경 
     //데이터 베이스에서 내 회원정보의 "friends"필드 값 받아와서 userFriends리스트에 추가하는 함수
     private void loadUserFriends(){
 
@@ -674,6 +686,7 @@ public class PlannerFragment extends Fragment implements onBackPressedListener{
             }
         });
     }
+    //코드 작성자 : 김서경 
     //뒤로가기 버튼눌렀을때 액티비티 종료
     @Override
     public void onBackPressed() {
