@@ -22,6 +22,7 @@ import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 
+//ProfileandFriendAdapter.java 파일 코드 작성자 : 김서경
 //친구목록 리사이클러뷰의 어댑터 
 public class ProfileandFriendAdapter extends RecyclerView.Adapter<ProfileandFriendAdapter.ItemViewHolder> {
     private ArrayList<MemberInfo> listData = new ArrayList<MemberInfo>();
