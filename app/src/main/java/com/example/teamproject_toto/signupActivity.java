@@ -93,6 +93,7 @@ public class signupActivity extends Activity {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
     }
+    
     //데이터베이스에 회원정보 등록하는 함수
     private void profileUpdate(String name, String phoneNumber){
 
@@ -118,7 +119,6 @@ public class signupActivity extends Activity {
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            Log.w(TAG, "Error adding document", e);
                             Toast.makeText(getApplicationContext(),"회원가입에 실패했습니다."+e.toString(),Toast.LENGTH_SHORT).show();
 
                         }
