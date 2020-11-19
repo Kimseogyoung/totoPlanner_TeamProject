@@ -2,13 +2,15 @@ package com.example.teamproject_toto;
 
 import java.util.ArrayList;
 
+//사용자의 회원정보 클래스
+//데이터베이스의 users컬렉션 문서들의 데이터필드는 이 클래스로 저장됨
 public class MemberInfo {
-    private String icon;
-    private String name;
-    private String id;
-    private String phoneNumber;
-    private ArrayList<String> friends;
-    private String friendcode;
+    private String icon;//프로필사진 이름
+    private String name;//이름
+    private String id;//아이디
+    private String phoneNumber;//전화번호
+    private ArrayList<String> friends;//친구목록
+    private String friendcode;//친구코드
 
     public MemberInfo(String icon,String name,String id,String phoneNumber ,String friendcode){
         this.icon=icon;
