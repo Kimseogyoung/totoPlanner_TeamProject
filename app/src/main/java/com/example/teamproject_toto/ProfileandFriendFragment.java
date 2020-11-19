@@ -54,6 +54,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+//ProfileandFriendFragment.java 파일 코드 작성자 : 김서경
 //내정보/친구목록 프래그먼트 클래스
 public class ProfileandFriendFragment extends Fragment implements onBackPressedListener {
     RecyclerView recyclerView;
