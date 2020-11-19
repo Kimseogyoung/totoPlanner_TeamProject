@@ -1,5 +1,7 @@
 package com.example.teamproject_toto;
 
+
+//TimelineboardInfo.java 파일 코드 작성자 : 김서경
 //타임라인 게시글 정보 클래스
 //파이어베이스에 저장될 문서의 데이터필드를 set하고, 타임라인에 글을 출력할 때 사용
 public class TimelineboardInfo {
