@@ -40,6 +40,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+//TimelineFragment.java 파일 코드 작성자 : 김서경
 //타임라인 프래그먼트
 public class TimelineFragment extends Fragment implements onBackPressedListener{
     RecyclerView recyclerView;
