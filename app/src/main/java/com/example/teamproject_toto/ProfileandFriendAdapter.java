@@ -22,7 +22,7 @@ import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 
-//친구목록 리사이클러뷰의 
+//친구목록 리사이클러뷰의 어댑터 
 public class ProfileandFriendAdapter extends RecyclerView.Adapter<ProfileandFriendAdapter.ItemViewHolder> {
     private ArrayList<MemberInfo> listData = new ArrayList<MemberInfo>();
     Context context;
