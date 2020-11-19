@@ -2,6 +2,7 @@ package com.example.teamproject_toto;
 
 import java.util.ArrayList;
 
+// MemberInfo.java 파일 코드 작성자 : 김서경
 //사용자의 회원정보 클래스
 //데이터베이스의 users컬렉션 문서들의 데이터필드는 이 클래스로 저장됨
 public class MemberInfo {
