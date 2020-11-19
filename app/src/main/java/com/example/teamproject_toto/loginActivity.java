@@ -16,9 +16,10 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+//사용자 로그인 액티비티
 public class loginActivity extends Activity {
     private FirebaseAuth mAuth;
-    private static final String TAG="LoginActivity";
+    private static final String TAG="LoginActivity";//디버깅 태그
 
     @Override
     protected void onCreate(Bundle saveInstanceState){
@@ -33,15 +34,16 @@ public class loginActivity extends Activity {
     }
 
 
+    //클릭이벤트 리스너 등록
     View.OnClickListener onClickListener=new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             switch (view.getId()){
-                case R.id.login_btn:
-                    signup();
+                case R.id.login_btn://로그인버튼 클릭
+                    login();//로그인 함수 호출
                     break;
-                case R.id.gotoSignup_btn:
-                    myStartActivity(signupActivity.class);
+                case R.id.gotoSignup_btn://회원가입 버튼 클릭
+                    myStartActivity(signupActivity.class);//회원가입 액티비티로 이동
                     break;
 
 
@@ -50,15 +52,16 @@ public class loginActivity extends Activity {
     };
 
 
-    private void signup(){
-        String email = ((EditText)findViewById(R.id.login_email)).getText().toString();
-        String password = ((EditText)findViewById(R.id.login_password)).getText().toString();
+    //사용자 로그인 함수
+    private void login(){
+        String email = ((EditText)findViewById(R.id.login_email)).getText().toString();//아이디
+        String password = ((EditText)findViewById(R.id.login_password)).getText().toString();//비밀번호
 
 
-        if(email.length() > 0 && password.length() > 0){
+        if(email.length() > 0 && password.length() > 0){//이메일과 비밀번호를 입력했을때
 
             mAuth.signInWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {//로그인 이벤트 리스너
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
@@ -70,25 +73,26 @@ public class loginActivity extends Activity {
                             } else {
                                 // If sign in fails, display a message to the user.
                                 startToast(task.getException().toString());
-
-                                // ...
                             }
                         }
                     });
-
         }else {
             Toast.makeText(this,"이메일 또는 비밀번호를 입력해주세요.",Toast.LENGTH_SHORT).show();
         }
     }
+    //Toast메시지를 만드는 함수
     private void startToast(String s){
         Toast.makeText(this,s,Toast.LENGTH_SHORT).show();
     }
 
+    //class c에 해당하는 액티비티로 이동하는 함수
     private void myStartActivity(Class c) {
         Intent intent = new Intent(this, c);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
     }
+    
+    //뒤로가기버튼 클릭시 강제종료
     @Override
     public void onBackPressed(){//뒤로가기 클릭시
         super.onBackPressed();
