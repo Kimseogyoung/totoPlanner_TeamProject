@@ -24,6 +24,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.Map;
 
+
+//signupActivity.java 파일 코드 작성자 : 김서경
 //회원가입 액티비티
 public class signupActivity extends Activity {
     private FirebaseAuth mAuth;
