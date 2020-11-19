@@ -65,7 +65,7 @@ import java.util.Map;
 
 import static androidx.constraintlayout.motion.utils.Oscillator.TAG;
 
-
+//일정 프래그먼트
 public class PlannerFragment extends Fragment implements onBackPressedListener{
 
     private static final String TAG="PlannerActivity";
@@ -97,7 +97,7 @@ public class PlannerFragment extends Fragment implements onBackPressedListener{
             int year = getArguments().getInt("Year"); // 전달한 key 값
             int month = getArguments().getInt("Month"); // 전달한 key 값
             int day = getArguments().getInt("Day");
-            today.setYear(year - 1900); // 대체... 비추천 써서 그런가....
+            today.setYear(year - 1900); 
             today.setMonth(month);
             today.setDate(day);
             }
@@ -130,7 +130,7 @@ public class PlannerFragment extends Fragment implements onBackPressedListener{
         yesterday_btn.setOnClickListener(dayShift);
         tomorrow_btn.setOnClickListener(dayShift);
 
-//         리스트뷰 컨텍스트 추가
+        //리스트뷰 컨텍스트 추가
         registerForContextMenu(plan_list);
 
         ImageButton random_btn = (ImageButton)getView().findViewById(R.id.random_btn);//랜덤 소확행
@@ -139,13 +139,15 @@ public class PlannerFragment extends Fragment implements onBackPressedListener{
         Button exit_btn= (Button)getView().findViewById(R.id.uploadtapExit_btn);//창닫기
 
 
+        //사진 업로드버튼 클릭 이벤트리스너
         photoUpload_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 openPhotoPopup();
             }
         });
-
+        
+        //타임라인 게시글 업로드버튼 클릭 이벤트리스너
         write_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -153,6 +155,7 @@ public class PlannerFragment extends Fragment implements onBackPressedListener{
                 items.get(planidx).setUploaded(true);
                 DataStore();
 
+                //현재 시간 받아와서 문자열 생성
                 SimpleDateFormat format = new SimpleDateFormat("yyyy년 MM 월 dd일 HH:mm:ss");
                 Date now = new Date();
                 String ss = format.format(now);
@@ -162,21 +165,21 @@ public class PlannerFragment extends Fragment implements onBackPressedListener{
                 getView().findViewById(R.id.uploadTap).setVisibility(View.INVISIBLE);
 
                 uploadPhoto(photo,ss2+username);
-                String title = "\"" + planname + "\" 달성 완료!";
+                String title = "\"" + planname + "\" 달성 완료!"; //게시글 제목
                 writemyTimelinedata(username,ss, title,
-                        ss2+username,popupText.getText().toString(),ss2);
-                //loadUserFriends();
+                        ss2+username,popupText.getText().toString(),ss2);//내 타임라인 데이터에 추가
                 writeFriendsTimelinedata(username,ss,title,
-                        ss2+username,popupText.getText().toString(),ss2);
+                        ss2+username,popupText.getText().toString(),ss2);//친구 타임라인 데이터에 추가
 
 
 
             }
         });
+        //게시글 작성팝업 나가기 버튼 클릭 이벤트리스너 
         exit_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getView().findViewById(R.id.uploadTap).setVisibility(View.INVISIBLE);
+                getView().findViewById(R.id.uploadTap).setVisibility(View.INVISIBLE);//
             }
         });
 
@@ -306,14 +309,14 @@ public class PlannerFragment extends Fragment implements onBackPressedListener{
                 });
                 break;
 
-            case R.id.upload_item:
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
-                if (simpleDateFormat.format(today).equals(simpleDateFormat.format(new Date()))){
-                    if(items.get(index).getCv() && !items.get(index).getUploaded()){// 체크박스(일정달성여부) 체크되었는지 확인해야함@@@@@@@@@@@@@@@@@
+            case R.id.upload_item://업로드 버튼 클릭 시
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");//현재 날짜 문자열 받아와서
+                if (simpleDateFormat.format(today).equals(simpleDateFormat.format(new Date()))){//오늘이 아닐경우 false
+                    if(items.get(index).getCv() && !items.get(index).getUploaded()){// 체크박스(일정달성여부)체크 안되어있을시 false
 
                         planidx=index;
                         planname = items.get(index).getText();//선택한일정내용
-                        getView().findViewById(R.id.uploadTap).setVisibility(View.VISIBLE);
+                        getView().findViewById(R.id.uploadTap).setVisibility(View.VISIBLE);//팝업 
 
                         TextView phototext=getView().findViewById(R.id.photourl_text);
                         phototext.setText("첨부된 사진 없음" );
@@ -469,9 +472,10 @@ public class PlannerFragment extends Fragment implements onBackPressedListener{
     };
 
 
+    //사진 선택 팝업창 열기
     private void openPhotoPopup(){
 
-        final CharSequence[] list={"사진촬영","앨범선택","취소"};
+        final CharSequence[] list={"사진촬영","앨범선택","취소"};//3가지 선택지
 
         AlertDialog.Builder alertDialogBulider=new AlertDialog.Builder(getContext());
 
@@ -500,7 +504,7 @@ public class PlannerFragment extends Fragment implements onBackPressedListener{
     private static final int PICK_FROM_ALBUM = 1;
 
 
-
+    //카메라 촬영
     private void takePicture(){
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(intent, PICK_FROM_CAMERA);
@@ -515,6 +519,7 @@ public class PlannerFragment extends Fragment implements onBackPressedListener{
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        //카메라,앨범에서 사진선택후 결과값 받아오기
         super.onActivityResult(requestCode,resultCode,data);
 
         if(resultCode != Activity.RESULT_OK )
@@ -545,15 +550,16 @@ public class PlannerFragment extends Fragment implements onBackPressedListener{
         }
 
     }
+    //선택한 사진을 파이어베이스 storage에 업로드
     private void uploadPhoto(final Bitmap phot, String name){
-
+        //phot - 사진 비트맵 , name - 저장될 사진의 이름
 
         if(phot != null)
         {
             FirebaseStorage storage = FirebaseStorage.getInstance();
 
             StorageReference storageRef = storage.getReference();
-            StorageReference ImagesRef = storageRef.child("images/"+name);
+            StorageReference ImagesRef = storageRef.child("images/"+name);//storage의 images폴더에 업로드
 
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -575,6 +581,8 @@ public class PlannerFragment extends Fragment implements onBackPressedListener{
 
         }
     }
+    //내 타임라인에 내 게시물 데이터 추가하기 함수
+    //"users"컬렉션 -> user.uid문서 -> "timeline"컬렉션에 새 문서 추가
     private void writemyTimelinedata(String name, String data,String title, String img,String content,String docuName){
 
         TimelineboardInfo timelineboardInfo=new TimelineboardInfo(user.getUid(),name, data,title,img,content,docuName);
@@ -583,14 +591,13 @@ public class PlannerFragment extends Fragment implements onBackPressedListener{
         if(user!=null){
 
             db.collection("user-timeline").document(user.getUid())
-                    .collection("timeline").document(docuName).set(timelineboardInfo);
+                    .collection("timeline").document(docuName).set(timelineboardInfo);//"user-timeline"컬렉션의 내 타임라인에도 게시물 추가
             db.collection("users").document(user.getUid())
                     .collection("timeline").document(docuName).set(timelineboardInfo)
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
                             Toast.makeText(getContext(),"업로드에 성공했습니다",Toast.LENGTH_SHORT).show();
-
                         }
 
                     })
@@ -606,6 +613,8 @@ public class PlannerFragment extends Fragment implements onBackPressedListener{
 
 
     }
+    //친구 타임라인에 내 게시물 데이터 추가하기 함수
+    //"users"컬렉션 -> 내 친구 문서 -> "timeline"컬렉션에 새 문서 추가
     private  void writeFriendsTimelinedata(String name, String data,String title, String img,String content,String docuName){
 
         TimelineboardInfo timelineboardInfo=new TimelineboardInfo(user.getUid(),name, data,title,img,content,docuName);
@@ -618,6 +627,7 @@ public class PlannerFragment extends Fragment implements onBackPressedListener{
             }
         }
     }
+    //데이터베이스에서 내 회원정보의 "name"필드 값 받아와서 username변수에 할당하는 함수
     private void loadUsername(){
         DocumentReference docRef = db.collection("users").document(user.getUid());
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -637,7 +647,7 @@ public class PlannerFragment extends Fragment implements onBackPressedListener{
         });
     }
 
-
+    //데이터 베이스에서 내 회원정보의 "friends"필드 값 받아와서 userFriends리스트에 추가하는 함수
     private void loadUserFriends(){
 
         DocumentReference docRef = db.collection("users").document(user.getUid());
@@ -664,6 +674,7 @@ public class PlannerFragment extends Fragment implements onBackPressedListener{
             }
         });
     }
+    //뒤로가기 버튼눌렀을때 액티비티 종료
     @Override
     public void onBackPressed() {
         getActivity().finish();
