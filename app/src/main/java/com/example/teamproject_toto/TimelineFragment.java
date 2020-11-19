@@ -176,7 +176,8 @@ public class TimelineFragment extends Fragment implements onBackPressedListener{
                             String newcomment="";
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 if(document!=null){
-                                    newcomment += document.getData().get("time")+"  "+username+"\n"+document.getData().get("text")+"\n\n";
+                                    newcomment += document.getData().get("time")+"  "+document.getData().get("name")+
+                                        "\n"+document.getData().get("text")+"\n\n";
                                 }
                             }
                             commenttext.setText(newcomment);
