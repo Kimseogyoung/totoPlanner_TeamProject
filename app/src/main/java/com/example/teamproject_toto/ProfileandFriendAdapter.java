@@ -22,6 +22,7 @@ import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 
+//친구목록 리사이클러뷰의 
 public class ProfileandFriendAdapter extends RecyclerView.Adapter<ProfileandFriendAdapter.ItemViewHolder> {
     private ArrayList<MemberInfo> listData = new ArrayList<MemberInfo>();
     Context context;
@@ -48,6 +49,7 @@ public class ProfileandFriendAdapter extends RecyclerView.Adapter<ProfileandFrie
         // 데이터 결합
         holder.nameText.setText(data.getName());
 
+        //친구 프로필이미지 로드
         //FirebaseStorage 인스턴스를 생성
         FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
         // 위의 저장소를 참조하는 파일명으로 지정
@@ -68,16 +70,16 @@ public class ProfileandFriendAdapter extends RecyclerView.Adapter<ProfileandFrie
             }
         });
         holder.pos=i;
-        holder.delBtn.setOnClickListener(new View.OnClickListener() {
+        holder.delBtn.setOnClickListener(new View.OnClickListener() {//친구삭제 버튼 클릭시 이벤트리스너
             @Override
             public void onClick(View view) {
-                fragment.removeFriend(holder.pos);
+                fragment.removeFriend(holder.pos);//ProfileandFriendFragment의 removeFriend함수 호출(인자로 클릭된 아이템 index전달)
             }
         });
-        holder.planBtn.setOnClickListener(new View.OnClickListener() {
+        holder.planBtn.setOnClickListener(new View.OnClickListener() {//친구의 일정 버튼 클릭시 이벤트리스너
             @Override
             public void onClick(View view) {
-                fragment.openPlanTap(holder.pos);
+                fragment.openPlanTap(holder.pos);//ProfileandFriendFragment의 openPlanTap함수 호출(인자로 클릭된 아이템 index전달)
             }
         });
 
