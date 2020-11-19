@@ -23,6 +23,8 @@ import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 
+
+//TimelineAdapter.java 파일 코드 작성자 : 김서경
 //타임라인 리사이클러뷰의 어댑터
 public class TimelineAdapter extends RecyclerView.Adapter<TimelineAdapter.ItemViewHolder> {
     private ArrayList<TimelineboardInfo> listData = new ArrayList<>();
