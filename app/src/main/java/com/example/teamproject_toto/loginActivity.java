@@ -16,6 +16,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+
+//loginActivity.java 파일 코드 작성자 : 김서경
 //사용자 로그인 액티비티
 public class loginActivity extends Activity {
     private FirebaseAuth mAuth;
