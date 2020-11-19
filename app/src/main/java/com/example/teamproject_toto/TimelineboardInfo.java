@@ -1,13 +1,15 @@
 package com.example.teamproject_toto;
 
+//타임라인 게시글 정보 클래스
+//파이어베이스에 저장될 문서의 데이터필드를 set하고, 타임라인에 글을 출력할 때 사용
 public class TimelineboardInfo {
-    String writercode;
-    String name;
-    String date;
-    String title="";
-    String img="";
-    String content="";
-    String id="";
+    String writercode;//작성자의 회원uid
+    String name; //작성자 이름
+    String date; //작성 날짜
+    String title=""; //글 제목
+    String img="";//첨부한 사진의 storge 이름
+    String content=""; //내용
+    String id="";//문서 id
 
     public TimelineboardInfo(String writercode ,String name, String date, String title, String img, String content,String id){
         this.writercode=writercode;
