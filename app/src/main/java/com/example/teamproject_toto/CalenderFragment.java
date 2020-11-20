@@ -12,10 +12,11 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+
+// CalenderFragment.java 작성자 : 이아연
+// 달력 캘린더
+// 해당 달력에서 얻은 값을 PlannerFragment.java로 보낸다.
 public class CalenderFragment extends Fragment {
-    // CalenderFragment.java 작성자 : 이아연
-    // 달력 캘린더
-    // 해당 달력에서 얻은 값을 PlannerFragment.java로 보낸다.
 
     private int Year, Month, Day; // 연도, 월, 일
 
