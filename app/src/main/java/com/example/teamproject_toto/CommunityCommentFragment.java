@@ -37,13 +37,15 @@ import java.util.Date;
 
 import static androidx.constraintlayout.motion.utils.Oscillator.TAG;
 
-
+// CommunityCommentFragment.java 작성자 : 이아연
+// 커뮤니티 게시판의 게시글을 누르면 해당 게시글과 댓글을 보여주는 fragment
+// 댓글 작성도 가능하다.
 public class CommunityCommentFragment extends Fragment implements onBackPressedListener{
 
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    FirebaseFirestore db = FirebaseFirestore.getInstance(); // 데이터베이스
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-    String kinds;
+    String kinds; // 어느 커뮤니티인지 저장하는 String
 
     RecyclerView comment;
     CommunityCommentAdapter adapter;
@@ -63,17 +65,17 @@ public class CommunityCommentFragment extends Fragment implements onBackPressedL
         final ImageView img = view.findViewById(R.id.citem_img);
 
         if(getArguments() != null){
-            nickname.setText(getArguments().getString("nickname"));
-            title.setText(getArguments().getString("title"));
-            date.setText(getArguments().getString("date"));
-            content.setText(getArguments().getString("content"));
-            kinds = getArguments().getString("kinds");
+            nickname.setText(getArguments().getString("nickname")); // 게시글 작성자 닉네임
+            title.setText(getArguments().getString("title")); // 게시글 제목
+            date.setText(getArguments().getString("date")); // 게시글 날짜
+            content.setText(getArguments().getString("content")); // 게시글 내용
+            kinds = getArguments().getString("kinds"); // 커뮤니티 종류
 
             //FirebaseStorage 인스턴스를 생성
             FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
             // 위의 저장소를 참조하는 파일명으로 지정
             StorageReference storageReference = firebaseStorage.getReference()
-                    .child(kinds+"/"+getArguments().getString("img"));
+                    .child(kinds+"/"+getArguments().getString("img")); // 커뮤니티의 해당 게시글의 이미지 가져오기
             //StorageReference에서 파일 다운로드 URL 가져옴
             storageReference.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
                 @Override
@@ -105,42 +107,46 @@ public class CommunityCommentFragment extends Fragment implements onBackPressedL
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         comment.setLayoutManager(layoutManager);
 
+        // fragment에 들어왔을 때, 저장되어 있던 댓글들 모두 
         comment_update();
 
         return view;
     }
 
+    // Button들이 눌렀을 때 onClickListener. switch문으로 각각 동작
     View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             switch (view.getId()){
-                case R.id.comment_plus:
-                    getView().findViewById(R.id.edit_commentTab).setVisibility(View.VISIBLE);
+                case R.id.comment_plus: // 댓글 작성 버튼
+                    getView().findViewById(R.id.edit_commentTab).setVisibility(View.VISIBLE); // 댓글 작성 칸 보이게
                     break;
-                case R.id.edit_comment_btn:
+                case R.id.edit_comment_btn: // 댓글 작성 후 완료 버튼
                     EditText editText = getView().findViewById(R.id.comment_et);
-                    if (editText.getText().length() > 0){
+                    if (editText.getText().length() > 0){ // 댓글이 쓰여있다면
                         Date now = new Date();
                         SimpleDateFormat format = new SimpleDateFormat("yyyy년 MM월 dd일 HH:mm:ss");
                         String str = format.format(now);
 
                         CommunityCommentInfo info = new CommunityCommentInfo(str, editText.getText().toString());
 
+                        // 해당 게시글 댓글을 데이터 베이스에 저장
                         db.collection(kinds).document(getArguments().getString("date"))
                                 .collection("comment").document(format.format(now)).set(info);
 
-                        editText.setText("");
+                        editText.setText(""); // 작성한것이 남아있지 않도록 공백으로
                         getView().findViewById(R.id.edit_commentTab).setVisibility(View.INVISIBLE);
 
+                        // 댓글 작성 후 업데이트해서 보이도록
                         comment_update();
                     }
                     break;
-                case R.id.ccexit_btn:
+                case R.id.ccexit_btn: // 해당 프래그먼트 취소(뒤로 가기) 버튼
                     Goback();
                     break;
-                case R.id.ccancle_btn:
+                case R.id.ccancle_btn: // 댓글 작성 취소 버튼
                 EditText et = getView().findViewById(R.id.comment_et);
-                et.setText("");
+                et.setText(""); // 작성하던것이 남아있지 않도록 공백으로
                 getView().findViewById(R.id.edit_commentTab).setVisibility(View.INVISIBLE);
                 break;
             }
@@ -148,19 +154,21 @@ public class CommunityCommentFragment extends Fragment implements onBackPressedL
         }
     };
 
+    // 뒤로 가기 메소드
     public void Goback(){
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         fragmentManager.beginTransaction().remove(this).commit();
-        CommunityBoardFragment communityFragment = new CommunityBoardFragment();
+        CommunityBoardFragment communityFragment = new CommunityBoardFragment(); // CommunityBoardFragment로 돌아간다.
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         Bundle bundle = new Bundle();
-        bundle.putString("kinds", kinds);
+        bundle.putString("kinds", kinds); // 커뮤니티 종류 보내기
         communityFragment.setArguments(bundle);
         transaction.replace(R.id.mainFrame, communityFragment).commit();
     }
 
+    // 저장되어 있던 댓글을 불러오는 메소드
     public void comment_update(){
-        comments.clear();
+        comments.clear(); // 댓글 리스트 비우기
 
         db.collection(kinds).document(getArguments().getString("date")).collection("comment")
                 .get()
@@ -176,8 +184,10 @@ public class CommunityCommentFragment extends Fragment implements onBackPressedL
                                     String comment = (String) document.get("comment");
                                     CommunityCommentInfo info = new CommunityCommentInfo(date, comment);
                                     comments.add(info);
+                                    // 댓글 리스트에 저장된 값 추가
                                 }
 
+                                // adapter를 적용해서 댓글이 보이도록 함
                                 adapter = new CommunityCommentAdapter(comments);
                                 comment.setAdapter(adapter);
                             } else {
@@ -191,6 +201,7 @@ public class CommunityCommentFragment extends Fragment implements onBackPressedL
 
     }
 
+    // 핸드폰 뒤로가기 버튼 클릭시 뒤로 가기 메소드 실행
     @Override
     public void onBackPressed() {
         Goback();
