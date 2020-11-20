@@ -17,7 +17,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.List;
-
+//MainActivity.java 파일 코드 작성자 : 김서경
 public class MainActivity extends AppCompatActivity {
     private static final String TAG="MainActivity";
     @Override
