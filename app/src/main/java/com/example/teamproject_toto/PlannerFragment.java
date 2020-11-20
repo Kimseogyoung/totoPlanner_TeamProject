@@ -115,6 +115,7 @@ public class PlannerFragment extends Fragment implements onBackPressedListener{
         plan_list = getView().findViewById(R.id.plan_list);//리스트뷰
         loadUsername();
         loadUserFriends();
+        getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN); // 키보드 올라올 때, 화면도 올라오게
 
         //게시글작성탭 내용
         final EditText popupText=getView().findViewById(R.id.edit_Text);
