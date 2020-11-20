@@ -319,7 +319,7 @@ public class PlannerFragment extends Fragment implements onBackPressedListener{
                     @Override
                     public void onClick(View view) {
                         EditText edit_et = getView().findViewById(R.id.edit_et);
-                        if (edit_et.getText().length() > 0){ // 편집된 내용이 있다면
+                         if (edit_et.getText().length() > 0 && !items.get(index).getCv()){ // 편집하는 내용이 있고 체크되어 있지 않다면
                             //PlannerItems item = new PlannerItems(edit_et.getText().toString(), false);
                             PlannerItems item = new PlannerItems(edit_et.getText().toString(), false,false);
                             items.set(index, item); // 일정 리스트에 추가
