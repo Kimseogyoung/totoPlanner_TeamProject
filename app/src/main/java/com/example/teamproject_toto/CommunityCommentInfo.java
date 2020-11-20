@@ -1,5 +1,7 @@
 package com.example.teamproject_toto;
 
+// CommunityCommentInfo.java 작성자 : 이아연
+// 커뮤니티 게시글의 댓글 정보
 public class CommunityCommentInfo {
     String date;
     String comment;
