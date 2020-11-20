@@ -11,8 +11,11 @@ import java.util.Random;
 
 import static androidx.constraintlayout.motion.utils.Oscillator.TAG;
 
-
+// RandomList.java 파일 작성자 : 이아연
+// 해당 파일은 소확행 기능을 위해 만들어진 것
+// 같은 날의 모든 사용자들은 같은 소확행을 얻도록 함. 날마다 랜덤으로 소확행 일정이 바뀌는 시스템.
 public class RandomList {
+    // 소확행 리스트
     private final List<String> randomList = new ArrayList<>(Arrays.asList(
             "독서 30분하기",
             "시원한 바람 쐬며 산책하기"
@@ -29,16 +32,17 @@ public class RandomList {
     ,"오늘의 일기 쓰기"
     ));
 
+    // 소확행 리스트에서 오늘의 소확행 난수 고정 랜덤 추출
     public String getRandomitem() {
-        Date today = new Date();
+        Date today = new Date(); // 오늘 날짜 가져오기
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
         String ss = format.format(today);
-        int seed = Integer.parseInt(ss);
+        int seed = Integer.parseInt(ss); // 오늘 날짜를 seed값으로 고정 -> 같은 날의 모든 사용자는 같은 소확행 일정 소화
 
         Random rand = new Random();
         rand.setSeed(seed);
 
-        String smallitem = randomList.get(rand.nextInt(randomList.size()));
+        String smallitem = randomList.get(rand.nextInt(randomList.size())); // randomList 크기 만큼 난수 범위 설정
 
         return smallitem;
     }
