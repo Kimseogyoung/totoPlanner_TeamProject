@@ -1,11 +1,13 @@
 package com.example.teamproject_toto;
 
+// CommunityboardInfo.java 작성자 : 이아연
+// 커뮤니티의 게시글의 정보
 public class CommunityboardInfo {
-    String nickname;
-    String title;
-    String content;
-    String date;
-    String img="";
+    String nickname; // 닉네임
+    String title; // 제목
+    String content; // 내용
+    String date; // 날짜
+    String img=""; // 이미지
 
     public CommunityboardInfo(String nickname, String title, String content, String date, String img){
         this.nickname = nickname;
