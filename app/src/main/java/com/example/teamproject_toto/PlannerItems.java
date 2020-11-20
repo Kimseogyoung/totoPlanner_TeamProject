@@ -1,10 +1,12 @@
 package com.example.teamproject_toto;
 
+// PlannerItems.java 작성자 : 이아연
+// Planner의 일정 아이템
 public class PlannerItems  {
 
-    private String text ;
-    private boolean cv;
-    private boolean uploaded;
+    private String text ; // 일정
+    private boolean cv; // 체크 여부
+    private boolean uploaded; // 업로드 여부
 
     public PlannerItems(String text, boolean cv ,boolean uploaded){
         this.text = text;
