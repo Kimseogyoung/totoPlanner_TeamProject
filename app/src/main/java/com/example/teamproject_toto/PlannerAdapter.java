@@ -18,13 +18,14 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import static com.example.teamproject_toto.PlannerFragment.today;
 
-
+// PlannerAdapter.java 작성자 : 이아연
+// Planner의 일정들을 ListView에 보여주기 위한 adapter.
 public class PlannerAdapter extends BaseAdapter {
     // Adapter에 추가된 데이터를 저장하기 위한 ArrayList
-    private ArrayList<PlannerItems> listViewItemList = new ArrayList<PlannerItems>();
+    private ArrayList<PlannerItems> listViewItemList = new ArrayList<PlannerItems>(); // Planneritems를 담는 ArrayList
 
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
-    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+    FirebaseFirestore db = FirebaseFirestore.getInstance(); // 데이터 베이스
+    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser(); // 로그인된 
 
     // ListViewAdapter의 생성자
     public PlannerAdapter(){
@@ -60,21 +61,24 @@ public class PlannerAdapter extends BaseAdapter {
         // 아이템 내 각 위젯에 데이터 반영
         textView.setText(listViewItem.getText());
         checkBox.setChecked(listViewItem.getCv());
+        
         if (checkBox.isChecked()) textView.setPaintFlags(textView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
 
+        // checkBox가 변할 때 처리
         checkBox.setOnCheckedChangeListener(new CheckBox.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if (b) {
-                    listViewItem.setCv(true);
+                if (b) { // 체크박스의 체크가 적용 되었다면
+                    listViewItem.setCv(true); 
                     textView.setPaintFlags(textView.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
                 }
-                else {
+                else { // 체크박스의 체크가 해제 되었다면
                     listViewItem.setCv(false);
                     textView.setPaintFlags(textView.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
 
                 }
 
+                // 체크 여부를 데이터 베이스에 
                 CVStore();
 
             }
@@ -102,6 +106,7 @@ public class PlannerAdapter extends BaseAdapter {
 
     }
 
+    // 체크박스의 체크여부를 데이터 베이스에 저장하는 메소드
     public void CVStore(){
 
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
