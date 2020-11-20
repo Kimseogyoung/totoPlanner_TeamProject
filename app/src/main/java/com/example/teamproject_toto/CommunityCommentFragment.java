@@ -49,7 +49,7 @@ public class CommunityCommentFragment extends Fragment implements onBackPressedL
 
     RecyclerView comment;
     CommunityCommentAdapter adapter;
-    ArrayList<CommunityCommentInfo> comments = new ArrayList<>();
+    ArrayList<CommunityCommentInfo> comments = new ArrayList<>(); // 댓글 
 
     Bitmap phot;
 
