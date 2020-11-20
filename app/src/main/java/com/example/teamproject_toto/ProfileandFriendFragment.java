@@ -196,7 +196,7 @@ public class ProfileandFriendFragment extends Fragment implements onBackPressedL
         frienduidList=new ArrayList<>();//친구 목록 초기화
         myfriendList=new ArrayList<>();
 
-        DocumentReference docRef = db.collection("users").document(user.getUid());
+        final DocumentReference docRef = db.collection("users").document(user.getUid());
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -205,11 +205,18 @@ public class ProfileandFriendFragment extends Fragment implements onBackPressedL
                     if (document != null) {
                         ArrayList<String> list = (ArrayList<String>) document.get("friends");//내 데이터베이스에서 friends필드에 있는 리스트를 읽음
                         if (list != null){
+                            for(int i=0; i<list.size();i++){//리스트 사이즈만큼 친구목록 설정
+                                MemberInfo m=new MemberInfo( "","","","","");
+                                myfriendList.add(m);
+                            }
+
                             for (String str : list){//str은 친구의 uid
 
                                 frienduidList.add(str);//읽어온 데이터를 코드상 친구 uid리스트에 추가
-                                
+                                final int index =frienduidList.indexOf(str);//데이터베이스 읽어오는 시간 차이때문에 인덱스값 저장
+                                Log.e("hh",str);
                                 DocumentReference docRef2 = db.collection("users").document(str);//데이터베이스에서 str에 해당하는 친구 회원정보 접근
+
                                 docRef2.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                                     @Override
                                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -221,7 +228,8 @@ public class ProfileandFriendFragment extends Fragment implements onBackPressedL
                                                 MemberInfo m=new MemberInfo( ""+document.get("icon")
                                                         ,(String) document.get("name"),"","","");
 
-                                                myfriendList.add(m);//친구리스트에 MemberInfo객체로 add
+                                                myfriendList.set(index,m);//친구리스트에 MemberInfo 객체로 set
+                                                Log.e("hh",m.getName().toString());
 
                                                 //어댑터 업데이트
                                                 adapter = new ProfileandFriendAdapter(myfriendList,getContext(),f);
