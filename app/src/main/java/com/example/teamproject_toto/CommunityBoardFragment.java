@@ -47,15 +47,18 @@ import java.util.Date;
 
 import static androidx.constraintlayout.motion.utils.Oscillator.TAG;
 
+// CommunityBoardFragment.java 작성자 : 이아연
+// 커뮤니티 기능으로 앱 사용자들이 모두 익명으로 함께 사용할 수 있다.
+// 각 커뮤니티의 종류에 따라 저장/로드 하는 경로를 다르게 하고 java파일은 하나로만 사용
 public class CommunityBoardFragment extends Fragment implements onBackPressedListener{
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
-    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+    FirebaseFirestore db = FirebaseFirestore.getInstance(); // 데이터 베이스 객체 생성
+    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser(); // 로그인해 있는 유저
 
     RecyclerView communityList;
 
     ArrayList<CommunityboardInfo> cboardList = new ArrayList<CommunityboardInfo>();
 
-    // 어느 게시판
+    // 어느 게시판인지 저장할 String
     String kinds;
 
     CommunityAdapter adapter;
@@ -68,20 +71,21 @@ public class CommunityBoardFragment extends Fragment implements onBackPressedLis
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_communityboard, container, false);
 
-        // 어느 게시판인지 받아오기
+        // 어느 게시판인지 받아오기 -> 받아온 값에 따라 저장/로드할 경로가 달라진다.
         if (getArguments() != null){
             switch (getArguments().getString("kinds")){
                 case "daily-life":
-                    kinds = "daily-life";
+                    kinds = "daily-life"; // 일상 생활 게시판
                     break;
                 case "employment":
-                    kinds = "employment";
+                    kinds = "employment"; // 취업 게시판
                     break;
                 case "exercise":
-                    kinds = "exercise";
+                    kinds = "exercise"; // 운동 게시판
                     break;
                 case "smallhappy":
-                    kinds = "smallhappy";
+                    kinds = "smallhappy"; // 소확행 게시판
+                    // 모든 사용자가 같은 날 같은 소확행을 받기 때문에 서로 공유하도록 만들었다.
                     break;
             }
         }
@@ -107,23 +111,24 @@ public class CommunityBoardFragment extends Fragment implements onBackPressedLis
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         communityList.setLayoutManager(layoutManager);
 
-        c_update();
+        c_update(); // 커뮤니티에 들어왔을 때 저장되어 있던 내용 모두 불러오기
 
-        adapter = new CommunityAdapter(cboardList, getContext(), f,kinds);
-        adapter.setOnItemClickListener(new CommunityAdapter.OnItemClickListener() {
+        adapter = new CommunityAdapter(cboardList, getContext(), f,kinds); // 리사이클러 뷰 아이템 adapter
+        // 아이템이 선택된다면, 해당 아이템만 보여주는 댓글 작성 가능한 fragment로 이동
+        adapter.setOnItemClickListener(new CommunityAdapter.OnItemClickListener() { 
             @Override
             public void onItemClick(View v, int position) {
                 CommunityboardInfo info = adapter.getListData().get(position);
                 FragmentTransaction transaction = getFragmentManager().beginTransaction();
-                CommunityCommentFragment fragment = new CommunityCommentFragment();
+                CommunityCommentFragment fragment = new CommunityCommentFragment(); // CommunityCommentFragment
                 Bundle bundle = new Bundle();
-                bundle.putString("nickname", info.getNickname());
-                bundle.putString("content", info.getContent());
-                bundle.putString("title", info.getTitle());
-                bundle.putString("date", info.getDate());
-                bundle.putString("kinds", kinds);
-                bundle.putString("img",info.getImg());
-                fragment.setArguments(bundle);
+                bundle.putString("nickname", info.getNickname()); // 아이템 작성자 닉네임
+                bundle.putString("content", info.getContent()); // 아이템 내용
+                bundle.putString("title", info.getTitle()); // 아이템 제목
+                bundle.putString("date", info.getDate()); // 아이템이 작성된 날짜
+                bundle.putString("kinds", kinds); // 커뮤니티 종류
+                bundle.putString("img",info.getImg()); // 아이템 이미지
+                fragment.setArguments(bundle); // 위에것들 전달
                 transaction.replace(R.id.mainFrame, fragment);
                 transaction.commit();
             }
@@ -132,26 +137,27 @@ public class CommunityBoardFragment extends Fragment implements onBackPressedLis
         return view;
     }
 
-
+    // Button들의 onclickListenter. switch문으로 아이디를 받아서 각각 동작
     View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             switch (view.getId()){
-                case R.id.cupload_btn:
+                case R.id.cupload_btn: // 아이템 작성칸 버튼
                     getView().findViewById(R.id.cuploadTap).setVisibility(View.VISIBLE);
+                    // 작성 칸이 눈에 보이게 된다.
 
                     EditText nickname_text1 = getView().findViewById(R.id.nickname_et);
                     EditText cedit_text1 = getView().findViewById(R.id.cedit_Text);
                     EditText cedit_title1 = getView().findViewById(R.id.ctitle_Text);
 
-                    nickname_text1.setText("");
-                    cedit_text1.setText("");
-                    cedit_title1.setText("");
+                    nickname_text1.setText(""); // 전에 쓰던것이 남아있지 않게 공백으로
+                    cedit_text1.setText(""); // 전에 쓰던것이 남아있지 않게 공백으로
+                    cedit_title1.setText(""); // 전에 쓰던것이 남아있지 않게 공백으로
                     break;
-                case R.id.back:
+                case R.id.back: // 뒤로 가기 버튼
                     Goback();
                     break;
-                case R.id.cupload_real_btn:
+                case R.id.cupload_real_btn: // 작성을 모두 완료했다면 업로드를 하는 버튼
                     EditText nickname_text = getView().findViewById(R.id.nickname_et);
                     String nickname = nickname_text.getText().toString();
                     EditText cedit_text = getView().findViewById(R.id.cedit_Text);
@@ -159,33 +165,35 @@ public class CommunityBoardFragment extends Fragment implements onBackPressedLis
                     EditText cedit_title = getView().findViewById(R.id.ctitle_Text);
                     String title = cedit_title.getText().toString();
 
+                    // 모든 내용을 작성했다면
                     if (nickname.length() > 0 && cedit_text.length() > 0 && cedit_title.length() > 0){
                         SimpleDateFormat format = new SimpleDateFormat("yyyy년 MM월 dd일 HH:mm:ss");
                         String ss = format.format(new Date());
 
-                        writemyCommunitydata(nickname,ss,title,str,ss+ " "+nickname);
+                        writemyCommunitydata(nickname,ss,title,str,ss+ " "+nickname); // 데이터 베이스에 저장
 
-                        nickname_text.setText("");
-                        cedit_text.setText("");
-                        cedit_title.setText("");
+                        nickname_text.setText(""); // 다시 켰을 때 남아있지 않게 공백으로
+                        cedit_text.setText(""); // 다시 켰을 때 남아있지 않게 공백으로
+                        cedit_title.setText(""); // 다시 켰을 때 남아있지 않게 공백으로
                         getView().findViewById(R.id.cuploadTap).setVisibility(View.INVISIBLE);
+                        // 작성 칸은 다시 보이지 않게 바꾼다
 
-                        uploadPhoto(photo,ss+ " " +nickname);
-                        refresh();
+                        uploadPhoto(photo,ss+ " " +nickname); // firebase stroage에 이미지 저장
+                        refresh(); // 새로 고침을 통해 작성한 내용을 보여준다.
                     } else {
+                        // 내용을 모두 채우지 않았을 때 토스트 메시지
                         Toast.makeText(getContext(),"모든 내용을 채우세요.",Toast.LENGTH_SHORT).show();
                     }
                     break;
-                case R.id.cuploadtapExit_btn:
-                    getView().findViewById(R.id.cuploadTap).setVisibility(View.INVISIBLE);
+                case R.id.cuploadtapExit_btn: // 작성 칸을 나가는 버튼
                     getView().findViewById(R.id.cuploadTap).setVisibility(View.INVISIBLE);
                     break;
 
-                case R.id.refresh_btn:
+                case R.id.refresh_btn: // 새로 고침 버튼
                     refresh();
                     break;
 
-                case R.id.cphotoupload_btn:
+                case R.id.cphotoupload_btn: // 사진을 업로드하는 버튼
                     openPhotoPopup();
                     break;
 
@@ -193,11 +201,15 @@ public class CommunityBoardFragment extends Fragment implements onBackPressedLis
         }
     };
 
+    // 새로 고침 메소드
+    // 다른 사용자가 게시물을 올렸을 때 새로고침하면 보인다.
     public void refresh(){
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.detach(this).attach(this).commit();
     }
 
+    // 뒤로 가기 메소드
+    // 다시 커뮤니티 선택 프래그먼트로 간다.
     public void Goback(){
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         fragmentManager.beginTransaction().remove(this).commit();
@@ -206,17 +218,19 @@ public class CommunityBoardFragment extends Fragment implements onBackPressedLis
         transaction.replace(R.id.mainFrame, communityFragment).commit();
     }
 
+    // 커뮤니티에 게시물이 있는지 판단하는 메소드
     public void ItemEmpty(){
 
-        if (cboardList.isEmpty()){
-            getView().findViewById(R.id.noBoard).setVisibility(View.VISIBLE);
+        if (cboardList.isEmpty()){ // 게시물이 없다면
+            getView().findViewById(R.id.noBoard).setVisibility(View.VISIBLE); // 게시물이 없다는 것을 알려준다.
         } else getView().findViewById(R.id.noBoard).setVisibility(View.INVISIBLE);
 
     }
 
+    // 사진을 업로드 하는 메소드
     private void openPhotoPopup(){
 
-        final CharSequence[] list={"사진촬영","앨범선택","취소"};
+        final CharSequence[] list={"사진촬영","앨범선택","취소"}; // 3가지 선택
 
         AlertDialog.Builder alertDialogBulider=new AlertDialog.Builder(getContext());
 
@@ -244,11 +258,11 @@ public class CommunityBoardFragment extends Fragment implements onBackPressedLis
     private static final int PICK_FROM_CAMERA = 0;
     private static final int PICK_FROM_ALBUM = 1;
 
-    private void takePicture(){
+    private void takePicture(){ // 사진을 찍을 수 있게 해준다.
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(intent, PICK_FROM_CAMERA);
     }
-    private void takeAlbum(){
+    private void takeAlbum(){ // 앨범에서 사진을 선택할 수 있게 해준다.
         // 앨범 호출
         Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setType("image/*");
@@ -256,6 +270,7 @@ public class CommunityBoardFragment extends Fragment implements onBackPressedLis
         startActivityForResult(intent, PICK_FROM_ALBUM);
     }
 
+    // 사진을 선택했을 때 처리
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode,resultCode,data);
@@ -263,7 +278,7 @@ public class CommunityBoardFragment extends Fragment implements onBackPressedLis
         if(resultCode != Activity.RESULT_OK )
             return;
 
-        if(requestCode==PICK_FROM_ALBUM){
+        if(requestCode==PICK_FROM_ALBUM){ // 앨범에서 사진을 선택했을 때
             try {
                 // 선택한 이미지에서 비트맵 생성
                 InputStream in = getActivity().getContentResolver().openInputStream(data.getData());
@@ -277,7 +292,7 @@ public class CommunityBoardFragment extends Fragment implements onBackPressedLis
                 e.printStackTrace();
             }
         }
-        else if(requestCode==PICK_FROM_CAMERA){
+        else if(requestCode==PICK_FROM_CAMERA){ // 카메라로 사진을 찍었을 때
             final Bundle extras = data.getExtras();
             if(extras!=null){
                 photo = extras.getParcelable("data");
@@ -288,6 +303,8 @@ public class CommunityBoardFragment extends Fragment implements onBackPressedLis
         }
 
     }
+    
+    // 사진을 올릴 때 firebase의 storage의 알맞는 경로에 사진을 저장한다.
     private void uploadPhoto(final Bitmap phot, String name){
 
 
@@ -296,7 +313,7 @@ public class CommunityBoardFragment extends Fragment implements onBackPressedLis
             FirebaseStorage storage = FirebaseStorage.getInstance();
 
             StorageReference storageRef = storage.getReference();
-            StorageReference ImagesRef = storageRef.child(kinds+"/"+name);
+            StorageReference ImagesRef = storageRef.child(kinds+"/"+name); // 각 커뮤니티의 storage
 
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -321,13 +338,14 @@ public class CommunityBoardFragment extends Fragment implements onBackPressedLis
 
 
 
+    // 작성한 커뮤니티 게시글을 firestore에 저장
     private void writemyCommunitydata(String nickname, String date, String title, String content, String img){
 
         CommunityboardInfo communityboardInfo = new CommunityboardInfo(nickname, title, content, date, img);
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         if(user!=null){
-            SimpleDateFormat format = new SimpleDateFormat("yyyy년 MM월 dd일 HH:mm:ss");
+            SimpleDateFormat format = new SimpleDateFormat("yyyy년 MM월 dd일 HH:mm:ss"); // 문서는 날짜-시간별로 저장
             String ss = format.format(new Date());
 
             db.collection(kinds).document(ss).set(communityboardInfo);
@@ -360,10 +378,10 @@ public class CommunityBoardFragment extends Fragment implements onBackPressedLis
                                     CommunityboardInfo info = new CommunityboardInfo(nickname, title,
                                             content, date, img);
 
-                                    cboardList.add(0,info);
+                                    cboardList.add(0,info); // 업데이트할 데이터를 ArrayList에 추가
                                 }
-                                ItemEmpty();
-                                communityList.setAdapter(adapter);
+                                ItemEmpty(); // 게시글이 없을때와 있을 때를 따로 처리
+                                communityList.setAdapter(adapter); // adapter를 통해서 저장되어 있던 아이템들을 리사이클러 뷰에 보여준다.
                             } else {
                                 Log.d(TAG, "task is null");
                             }
@@ -375,6 +393,7 @@ public class CommunityBoardFragment extends Fragment implements onBackPressedLis
 
     }
 
+    // 휴대폰의 뒤로가기 선택시 Goback 메소드 실행
     @Override
     public void onBackPressed() {
         Goback();
