@@ -8,8 +8,10 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 
+// CommunityCommentAdapter.java 작성자 : 이아연
+// 커뮤니티 게시글의 댓글을 담은 리사이클러뷰 아이템들의 adapter
 public class CommunityCommentAdapter extends RecyclerView.Adapter<CommunityCommentAdapter.ItemViewHolder> {
-    private ArrayList<CommunityCommentInfo> listData = new ArrayList<>();
+    private ArrayList<CommunityCommentInfo> listData = new ArrayList<>(); // CommunityCommentInfo의 ArrayList
 
     public CommunityCommentAdapter(ArrayList<CommunityCommentInfo> data){
         listData=data;
