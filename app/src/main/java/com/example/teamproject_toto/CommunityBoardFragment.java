@@ -56,7 +56,7 @@ public class CommunityBoardFragment extends Fragment implements onBackPressedLis
 
     RecyclerView communityList;
 
-    ArrayList<CommunityboardInfo> cboardList = new ArrayList<CommunityboardInfo>();
+    ArrayList<CommunityboardInfo> cboardList = new ArrayList<CommunityboardInfo>(); // 게시글 
 
     // 어느 게시판인지 저장할 String
     String kinds;
@@ -358,7 +358,7 @@ public class CommunityBoardFragment extends Fragment implements onBackPressedLis
     // 커뮤니티 게시글 업데이트
     public void c_update(){
 
-        cboardList.clear();
+        cboardList.clear(); // 게시글 리스트 비우기
 
         db.collection(kinds)
                 .get()
@@ -378,7 +378,7 @@ public class CommunityBoardFragment extends Fragment implements onBackPressedLis
                                     CommunityboardInfo info = new CommunityboardInfo(nickname, title,
                                             content, date, img);
 
-                                    cboardList.add(0,info); // 업데이트할 데이터를 ArrayList에 추가
+                                    cboardList.add(0,info); // 업데이트할 데이터를 게시글 리스트에 추가
                                 }
                                 ItemEmpty(); // 게시글이 없을때와 있을 때를 따로 처리
                                 communityList.setAdapter(adapter); // adapter를 통해서 저장되어 있던 아이템들을 리사이클러 뷰에 보여준다.
