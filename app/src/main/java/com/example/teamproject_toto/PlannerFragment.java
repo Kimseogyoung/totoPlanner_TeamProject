@@ -78,7 +78,7 @@ public class PlannerFragment extends Fragment implements onBackPressedListener{
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-    // 리스트뷰에 추가할 리스트, 체크상태 표시할 리스트
+    // 플래너의 일정 리스트
     ArrayList<PlannerItems> items = new ArrayList<PlannerItems>();
     //리스트뷰
     ListView plan_list;
@@ -94,10 +94,13 @@ public class PlannerFragment extends Fragment implements onBackPressedListener{
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         if(getArguments() != null) {
-            int year = getArguments().getInt("Year"); // 전달한 key 값
+            // 달력에서 날짜를 받아왔다면 today에 저장해야함
+            int year = getArguments().getInt("Year"); // 전달한 key 값 (1900이 추가되서 들어옴)
             int month = getArguments().getInt("Month"); // 전달한 key 값
             int day = getArguments().getInt("Day");
-            today.setYear(year - 1900); 
+            
+            // today에 값 저장해주기
+            today.setYear(year - 1900); // 1900 빼주기
             today.setMonth(month);
             today.setDate(day);
             }
@@ -185,20 +188,24 @@ public class PlannerFragment extends Fragment implements onBackPressedListener{
             }
         });
 
-        //random_btn -> 하루 한 번만 하게 하는 거랑, 삭제하면 다시 할 수 있게 하는 거 추가@@@@@
+        // 코드 작성자 : 이아연
+        //random_btn 클릭 이벤트
         random_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                RandomList randomList = new RandomList();
-                String random = "😁 " + randomList.getRandomitem();
+                RandomList randomList = new RandomList(); 
+                String random = "😁 " + randomList.getRandomitem(); // 랜덤 리스트에서 오늘의 소확행 받아오기
 
+                // planner의 일정들을 일시적으로 리스트에 저장 -> 소확행이 중복 되었는지 확인하기 위해
                 ArrayList<String> temp = new ArrayList<String>();
                 for (PlannerItems plannerItems : items){
                     temp.add(plannerItems.getText());
                 }
 
-                if (!temp.contains(random)){
+                if (!temp.contains(random)){ // 일정 리스트에 소확행이 없다면
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
+                    
+                    // today가 소확행을 받는 date와 같은지 확인 -> 다른 날짜에 소확행을 받을 수 없게 하기 위해
                     if (simpleDateFormat.format(today).equals(simpleDateFormat.format(new Date()))){
 
                         AlertDialog.Builder dlg = new AlertDialog.Builder(getContext());
@@ -207,34 +214,37 @@ public class PlannerFragment extends Fragment implements onBackPressedListener{
                         // 아이템에 넣어주기
                         PlannerItems item = new PlannerItems(random, false,false);
 
-                        items.add(item);
-                        DataStore();
-                        adapterSet();
+                        items.add(item); // 일정 리스트에 소확행 추가
+                        DataStore(); // 데이터 베이스에 저장
+                        adapterSet(); // adapter를 적용해서 눈에 보이게
 
                         dlg.setMessage(random); // 메시지
                         dlg.show();
 
-                    } else Toast.makeText(getContext(),"소확행은 오늘만!",Toast.LENGTH_SHORT).show();
+                    } else Toast.makeText(getContext(),"소확행은 오늘만!",Toast.LENGTH_SHORT).show(); // today와 소확행을 부르는 날짜가 맞지 않을 경우
 
-                } else Toast.makeText(getContext(),"소확행은 한번만!",Toast.LENGTH_SHORT).show();
+                } else Toast.makeText(getContext(),"소확행은 한번만!",Toast.LENGTH_SHORT).show(); // 소확행을 중복해서 하는 경우
 
             }
         });
     }
 
 
-
+    // 코드 작성자 : 이아연
+    // 해당 프래그먼트를 처음 들어갔을 때 초기화하는 메소드
     public void Initialize(){
         SimpleDateFormat dateformat = new SimpleDateFormat("   yyyy년 \n MM월 dd일");
-        String date = dateformat.format(today);
+        String date = dateformat.format(today); 
         date_tv = getView().findViewById(R.id.date_tv);
         date_tv.setText(date);
-        items.clear();
+        items.clear(); // 일정 리스트는 비우기
 
         // 저장된 값 가져오기
         DataLoad();
     }
 
+    // 코드 작성자 : 이아연
+    // today의 다음 날로 가는 메소드
     private Date getNextDay(Date today){
         Calendar cal=Calendar.getInstance();
         cal.setTime(today);
@@ -242,6 +252,8 @@ public class PlannerFragment extends Fragment implements onBackPressedListener{
         return cal.getTime();
     }
 
+    // 코드 작성자 : 이아연
+    // today의 전 날로 가는 메소드
     private Date getPreviousDay(Date today){
         Calendar cal=Calendar.getInstance();
         cal.setTime(today);
@@ -249,7 +261,8 @@ public class PlannerFragment extends Fragment implements onBackPressedListener{
         return cal.getTime();
     }
 
-    // 컨텍스트 메뉴
+    // 코드 작성자 : 이아연
+    // 일정 리스트의 컨텍스트 메뉴 적용
     @Override
     public void onCreateContextMenu(@NonNull ContextMenu menu, @NonNull View v, @Nullable ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
@@ -265,47 +278,55 @@ public class PlannerFragment extends Fragment implements onBackPressedListener{
 
         switch (item.getItemId()){
 
-            case R.id.delete_item:
-                items.remove(index);
-                adapterSet();
+            // 코드 작성자 : 이아연 
+            case R.id.delete_item: // 일정 아이템 삭제
+                items.remove(index); // 일정 리스트에서 해당 인덱스 삭제
+                adapterSet(); // adapter를 적용해서 삭제한 상태로 리스트뷰 변경
                 SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
                 String ss = format.format(today);
                 Map<String, Object> map = new HashMap<String, Object>();
-                map.put("list", items);
+                map.put("list", items); 
+                
+                // 해당 일정이 삭제된 일정 리스트를 데이터 베이스에 저장
                 db.collection("users").document(user.getUid())
                         .collection("planner").document(ss).set(map);
+                
+                // 아이템이 있는지 없는지 판단해서 처리하는 코드
                 ItemEmpty();
                 break;
 
-            case R.id.edit_item:
+            // 코드 작성자 : 이아연
+            case R.id.edit_item: // 일정 아이템 편집
                 final LinearLayout item_menu = getActivity().findViewById(R.id.item_menu);
-                item_menu.setVisibility(View.VISIBLE);
+                item_menu.setVisibility(View.VISIBLE); // 일정 편집 칸 보이도록
                 final ImageButton edit_btn = getView().findViewById(R.id.edit_btn);
                 
-                // 컨텍스트 편집 취소
+                // 코드 작성자 : 이아연
+                // 일정 아이템 편집 취소
                 ImageButton cancle_btn = getView().findViewById(R.id.cancel_btn);
                 cancle_btn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         EditText edit_et = getView().findViewById(R.id.edit_et);
-                        edit_et.setText("");
+                        edit_et.setText(""); // 작성한 것이 사라지도록 공백으로
                         item_menu.setVisibility(View.INVISIBLE);
 
                     }
                 });
 
+                // 일정 아이템 편집 완료
                 edit_btn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         EditText edit_et = getView().findViewById(R.id.edit_et);
-                        if (edit_et.getText().length() > 0){
+                        if (edit_et.getText().length() > 0){ // 편집된 내용이 있다면
                             //PlannerItems item = new PlannerItems(edit_et.getText().toString(), false);
                             PlannerItems item = new PlannerItems(edit_et.getText().toString(), false,false);
-                            items.set(index, item);
+                            items.set(index, item); // 일정 리스트에 추가
                         }
-                        edit_et.setText("");
-                        DataStore();
-                        adapterSet();
+                        edit_et.setText(""); // 작성한 내용이 사라지도록 공백으로
+                        DataStore(); // 데이터 베이스에 저장
+                        adapterSet(); // adapter를 적용해서 편집한 내용을 리스트뷰에 
                         item_menu.setVisibility(View.INVISIBLE);
                     }
                 });
@@ -336,43 +357,51 @@ public class PlannerFragment extends Fragment implements onBackPressedListener{
         return super.onContextItemSelected(item);
     }
 
+    // 코드 작성자 : 이아연
+    // 일정을 추가하는 버튼 클릭 리스너
     View.OnClickListener Editing = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             EditText plan_edit = getView().findViewById(R.id.plan_edit);
             String st = plan_edit.getText().toString();
 
-            if (st.length() > 0){
+            if (st.length() > 0){ // 추가하는 내용이 있다면
                 PlannerItems item = new PlannerItems(st, false,false);
-                items.add(item);
+                items.add(item); // 일정 리스트에 추가
 
-                plan_edit.setText("");
+                plan_edit.setText(""); // 추가한 내용이 사라지도록 공백으로
 
-                DataStore();
-                ItemEmpty();
-                adapterSet();
+                DataStore(); // 데이터베이스에 저장
+                ItemEmpty(); // 일정 아이템이 있는지 없는지 판단해서 처리
+                adapterSet(); // adpter를 적용해서 추가한 일정을 listview에 적용함
             }
         }
     };
 
+    // 코드 작성자 : 이아연
+    // listview에 adapter를 적용하는 메소드
     public void adapterSet(){
         PlannerAdapter adapter = new PlannerAdapter();
 
         for (int i = 0; i < items.size(); i++){
-            adapter.addItem(items.get(i));
+            adapter.addItem(items.get(i)); // adapter에 일정 리스트에 있는 아이템 추가
         }
 
-        plan_list.setAdapter(adapter);
+        plan_list.setAdapter(adapter); // 리스트뷰에 adapter 적용
     }
 
+    // 코드 작성자 : 이아연
+    // 일정 아이템이 있는지 없는지를 판단해서 처리하는 메소드
     public void ItemEmpty(){
 
-        if (items.isEmpty()){
-            getView().findViewById(R.id.noPlan).setVisibility(View.VISIBLE);
+        if (items.isEmpty()){ //일정 아이템이 없다면
+            getView().findViewById(R.id.noPlan).setVisibility(View.VISIBLE); // 일정이 없다는 표시 보이게
         } else getView().findViewById(R.id.noPlan).setVisibility(View.INVISIBLE);
 
     }
 
+    // 코드 작성자 : 이아연
+    // 데이터 베이스에 일정, 일정 달성 여부(체크박스), 업로드 여부 저장
     public void DataStore(){
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
         String ss = format.format(today);
@@ -393,12 +422,15 @@ public class PlannerFragment extends Fragment implements onBackPressedListener{
         map.put("uploaded",uplist);
 
 
+        // 문서는 날짜별로 저장
         db.collection("users").document(user.getUid())
                 .collection("planner").document(ss).set(map);
 
 
     }
 
+    // 코드 작성자 : 이아연
+    // 데이터 베이스에 저장된 값을 불러오는 메소드
     public void DataLoad(){
         SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
         final String ss = format.format(today);
@@ -413,17 +445,17 @@ public class PlannerFragment extends Fragment implements onBackPressedListener{
                     DocumentSnapshot document = task.getResult();
                     if (document != null) {
 
-                        ArrayList<String> list = (ArrayList<String>) document.get("text");
-                        ArrayList<Boolean> clist = (ArrayList<Boolean>) document.get("cv");
-                        ArrayList<Boolean> ulist = (ArrayList<Boolean>) document.get("uploaded");
+                        ArrayList<String> list = (ArrayList<String>) document.get("text"); // 일정 텍스트 리스트
+                        ArrayList<Boolean> clist = (ArrayList<Boolean>) document.get("cv"); // 일정 달성 여부 (boolean) 리스트
+                        ArrayList<Boolean> ulist = (ArrayList<Boolean>) document.get("uploaded"); // 업로드 여부 (boolean) 리스트
 
                         plan_list = getView().findViewById(R.id.plan_list);
 
                         if (list != null && clist != null) {
-                            if (list.size() == clist.size()){
+                            if (list.size() == clist.size()){ // 일정 텍스트 리스트와 일정 달성 여부 리스트는 항상 크기가 똑같아야함
                                 for (int i = 0; i < list.size(); i++){
                                     PlannerItems item = new PlannerItems(list.get(i), clist.get(i),ulist.get(i));
-                                    items.add(item);
+                                    items.add(item); // 일정 리스트에 추가
                                 }
                             } else Log.d(TAG, "크기 다름 이상");
                         } else Log.d(TAG, "list/clist/ulist 비었음");
@@ -433,14 +465,16 @@ public class PlannerFragment extends Fragment implements onBackPressedListener{
                 } else {
                     Log.d(TAG, "get failed with ", task.getException());
                 }
-                ItemEmpty();
-                adapterSet();
+                ItemEmpty(); 
+                adapterSet(); // adapter 적용해서 불러온 값 리스트뷰에 적용
             }
         });
 
     }
 
 
+    // 코드 작성자 : 이아연
+    // 날짜가 표시된 textview를 클릭시 달력 fragment로 감.
     View.OnClickListener myFragment = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
@@ -451,24 +485,26 @@ public class PlannerFragment extends Fragment implements onBackPressedListener{
         }
     };
 
+    // 코드 작성자 : 이아연
+    // 화살표 버튼을 클릭시 실해오디는 OnclickListener
     View.OnClickListener dayShift = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             switch (view.getId()){
-                case R.id.yesterday_btn:
-                    today = getPreviousDay(today);
+                case R.id.yesterday_btn: // 전 날 버튼
+                    today = getPreviousDay(today); // today 값이 전 날로 바뀜
                     SimpleDateFormat dateformat1 = new SimpleDateFormat("   yyyy년 \n MM월 dd일");
                     String date1 = dateformat1.format(today);
                     date_tv.setText(date1);
-                    Initialize();
+                    Initialize(); // 다시 초기화
                     break;
 
-                case R.id.tomorrow_btn:
-                    today = getNextDay(today);
+                case R.id.tomorrow_btn: // 다음 날 버튼
+                    today = getNextDay(today); // today 값이 다음날로 바뀜
                     SimpleDateFormat dateformat2 = new SimpleDateFormat("   yyyy년 \n MM월 dd일");
                     String date2 = dateformat2.format(today);
                     date_tv.setText(date2);
-                    Initialize();
+                    Initialize(); // 다시 
                     break;
             }
         }
